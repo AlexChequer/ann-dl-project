@@ -13,7 +13,7 @@ three parts over the semester.
 |-----------|--------|
 | Alex Chequer | [AlexChequer](https://github.com/AlexChequer) |
 | | [Lucasikawa](https://github.com/Lucasikawa) |
-| | [carloshernanic](https://github.com/carloshernanic) |
+| Carlos Hernani Cardoso | [carloshernanic](https://github.com/carloshernanic) |
 
 ## The three deliverables
 

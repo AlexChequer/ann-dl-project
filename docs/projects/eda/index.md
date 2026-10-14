@@ -5,7 +5,7 @@ dataset: https://www.kaggle.com/datasets/dgomonov/new-york-city-airbnb-open-data
 team:
   - Alex Chequer
   - Lucasikawa
-  - carloshernanic
+  - Carlos Hernani Cardoso
 ai_use: "Claude (Anthropic) helped write the scripts in code/ and draft the text; every number and decision was reviewed by the team."
 ---
 
@@ -17,7 +17,7 @@ ai_use: "Claude (Anthropic) helped write the scripts in code/ and draft the text
     |-----------|--------|
     | Alex Chequer | [AlexChequer](https://github.com/AlexChequer) |
     | | [Lucasikawa](https://github.com/Lucasikawa) |
-    | | [carloshernanic](https://github.com/carloshernanic) |
+    | Carlos Hernani Cardoso | [carloshernanic](https://github.com/carloshernanic) |
 
     Dataset, decisions and status: [project page](../index.md).
 
@@ -52,10 +52,24 @@ review recorded on 2019-07-08).
 
 **Each row** is one Airbnb listing in New York City.
 
-<!-- table: one row per CSV column (16), with meaning, type and unit -->
 | Feature | Meaning | Type | Unit |
 |---------|---------|------|------|
-| | | | |
+| `id` | Unique identifier of the listing (one per row; 48,895 distinct) | ID (integer) | — |
+| `name` | Title of the listing, written by the host (e.g. "Cozy room, great area, near train") | Free text | — |
+| `host_id` | Unique identifier of the host; the same host can own several listings (37,457 distinct) | ID (integer) | — |
+| `host_name` | First name of the host (11,452 distinct) | Free text (personal name) | — |
+| `neighbourhood_group` | Borough of New York City where the listing is: Manhattan, Brooklyn, Queens, Bronx or Staten Island | Nominal categorical (5 levels) | — |
+| `neighbourhood` | Neighbourhood inside the borough (e.g. Williamsburg, Harlem) | Nominal categorical (221 levels) | — |
+| `latitude` | North–south coordinate of the listing (40.50 to 40.91) | Numeric continuous | decimal degrees |
+| `longitude` | East–west coordinate of the listing (−74.24 to −73.71) | Numeric continuous | decimal degrees |
+| `room_type` | Kind of space offered: Entire home/apt, Private room or Shared room | Nominal categorical (3 levels) | — |
+| `price` | Nightly price set by the host — the **target** (0 to 10,000) | Numeric continuous (stored as integer) | US$ per night |
+| `minimum_nights` | Minimum length of stay the host requires per booking (1 to 1,250) | Numeric discrete | nights |
+| `number_of_reviews` | Total number of reviews the listing has received (0 to 629) | Numeric discrete (count) | reviews |
+| `last_review` | Date of the most recent review (2011-03-28 to 2019-07-08); empty when the listing has no reviews | Date (`YYYY-MM-DD`) | — |
+| `reviews_per_month` | Average rate of reviews received per month (0.01 to 58.5); empty when the listing has no reviews | Numeric continuous | reviews/month |
+| `calculated_host_listings_count` | Number of listings the same host has in this dataset (1 to 327) | Numeric discrete (count) | listings |
+| `availability_365` | Number of days the listing is open for booking in the next year (0 to 365) | Numeric discrete, bounded | days in the next 365 |
 
 ### B. Quality
 
