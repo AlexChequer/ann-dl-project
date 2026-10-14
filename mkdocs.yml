@@ -1,0 +1,170 @@
+# =============================================================================
+#  Template de entregas — Redes Neurais Artificiais & Deep Learning
+#  Serve a qualquer edição da disciplina: https://insper.github.io/ann-dl/
+#
+#  ANTES DE PUBLICAR: troque todas as linhas marcadas com "# TROCAR" abaixo.
+#  Passo a passo em docs/template/index.md > Publicação no GitHub Pages.
+# =============================================================================
+site_name: ANN-DL · Entregas                  # TROCAR: título exibido no topo do site
+site_author: Seu Nome, Sobrenome              # TROCAR: seu nome (ou os nomes do grupo)
+site_url: https://repo-classes.github.io/ann-dl    # TROCAR: https://<seu-usuario>.github.io/<seu-repo>
+repo_url: https://github.com/repo-classes/ann-dl/   # TROCAR: https://github.com/<seu-usuario>/<seu-repo>
+repo_name: repo-classes/ann-dl                     # TROCAR: <seu-usuario>/<seu-repo>
+
+theme:
+  name: material
+  language: pt-BR
+  palette:
+    # Modo claro
+    - media: "(prefers-color-scheme: light)"
+      scheme: default
+      primary: grey
+      toggle:
+        icon: material/toggle-switch-off-outline
+        name: Mudar para o modo escuro
+
+    # Modo escuro
+    - media: "(prefers-color-scheme: dark)"
+      scheme: slate
+      primary: grey
+      toggle:
+        icon: material/toggle-switch
+        name: Mudar para a preferência do sistema
+  features:
+    - content.code.copy
+    - content.code.select
+    - content.code.annotate
+    - content.tooltips
+    - navigation.instant
+    - navigation.instant.progress
+    - navigation.top
+    - navigation.path
+    - navigation.tracking
+    - navigation.expand
+    - navigation.indexes
+  icon:
+    admonition:
+      note: fontawesome/solid/note-sticky
+      abstract: fontawesome/solid/book
+      info: fontawesome/solid/circle-info
+      tip: fontawesome/solid/bullhorn
+      success: fontawesome/solid/check
+      question: fontawesome/solid/circle-question
+      warning: fontawesome/solid/triangle-exclamation
+      failure: fontawesome/solid/bomb
+      danger: fontawesome/solid/skull
+      bug: fontawesome/solid/robot
+      example: fontawesome/solid/flask
+      quote: fontawesome/solid/quote-left
+
+markdown_extensions:
+  - admonition
+  - attr_list
+  - md_in_html
+  - footnotes
+  - tables
+  - pymdownx.arithmatex:
+      generic: true
+  - pymdownx.details
+  - pymdownx.highlight:
+      anchor_linenums: true
+      line_spans: __span
+      pygments_lang_class: true
+  - pymdownx.emoji:
+      emoji_index: !!python/name:material.extensions.emoji.twemoji
+      emoji_generator: !!python/name:material.extensions.emoji.to_svg
+  - pymdownx.inlinehilite
+  # Inclusão de arquivos (--8<--): use para trazer os scripts de code/ para o relatório
+  - pymdownx.snippets:
+      base_path: [.]
+      check_paths: true
+      url_download: true
+  - pymdownx.superfences:
+      custom_fences:
+        - name: mermaid
+          class: mermaid
+          format: !!python/name:pymdownx.superfences.fence_code_format
+  - pymdownx.tabbed:
+      alternate_style: true
+  - pymdownx.tasklist:
+      custom_checkbox: true
+  - pymdownx.critic
+  - pymdownx.caret
+  - pymdownx.keys
+  - pymdownx.mark
+  - pymdownx.tilde
+  - pymdownx.blocks.caption
+
+plugins:
+  - search:
+      lang: pt
+  # Lightbox nas figuras dos relatórios
+  - glightbox
+  # A data da última alteração é a evidência do prazo de entrega
+  - git-revision-date-localized:
+      enable_creation_date: true
+  - git-authors
+  - minify:
+      minify_html: true
+  # Renderiza notebooks .ipynb colocados diretamente na nav
+  - mkdocs-jupyter:
+      execute: false
+      allow_errors: false
+      include_source: true
+      # Sem isto, os .py de code/ virariam páginas do site
+      include: ["*.ipynb"]
+
+# Além dos links, valida as âncoras (#secao) — com --strict, âncora quebrada vira erro.
+validation:
+  omitted_files: warn
+  absolute_links: warn
+  unrecognized_links: warn
+  anchors: warn
+
+# Os scripts de code/ ficam no repositório e são incluídos nos relatórios via --8<--,
+# mas não são páginas da navegação.
+not_in_nav: |
+  /exercises/*/code/*
+  /projects/*/code/*
+
+extra_javascript:
+  # A configuração precisa vir ANTES da biblioteca do MathJax
+  - javascripts/mathjax.js
+  - https://unpkg.com/mathjax@3/es5/tex-mml-chtml.js
+
+# =============================================================================
+#  NAVEGAÇÃO — uma entrega, um item de menu.
+#
+#  Cada item aceita três formas (veja "Exemplos de uso" para os três em ação):
+#    1. Markdown ...: exercises/data/index.md
+#    2. Notebook  ...: exercises/data/index.ipynb
+#    3. Colab     ...: https://colab.research.google.com/drive/<ID>
+# =============================================================================
+nav:
+  - Home: index.md
+  - Como usar este template: template/index.md
+
+  # A lista de entregas muda de edição para edição: acrescente ou remova itens
+  # aqui e as pastas correspondentes em docs/.
+  - Data: exercises/data/index.md
+  - Perceptron: exercises/perceptron/index.md
+  - MLP: exercises/mlp/index.md
+  - VAE: exercises/vae/index.md
+
+  # O projeto é UM só, com três entregas ao longo do semestre.
+  - Projeto:
+    - projects/index.md
+    - 1. EDA: projects/eda/index.md
+    # Escolha UMA das duas linhas abaixo, e apague a outra (e a pasta que sobrar):
+    - 2. Classificação: projects/classification/index.md
+    - 2. Regressão: projects/regression/index.md
+    - 3. Generativo: projects/generative/index.md
+
+  # Remova esta seção inteira quando não precisar mais dos exemplos.
+  - Exemplos de uso:
+    - Como montar o menu: examples/index.md
+    - Notebook no menu: examples/notebook/data-exercise-1.ipynb
+    # TROCAR "usuario/ann-dl" pelo seu repositório, senão o link abre o notebook de outra pessoa:
+    - Abrir no Colab ↗: https://colab.research.google.com/github/usuario/ann-dl/blob/main/docs/examples/notebook/data-exercise-1.ipynb
+
+  - Enunciados da disciplina ↗: https://insper.github.io/ann-dl/

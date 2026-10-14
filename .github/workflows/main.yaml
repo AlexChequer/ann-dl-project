@@ -1,0 +1,47 @@
+name: ci
+on:
+  push:
+  pull_request:
+  # Permite disparar o build à mão em Actions > ci > Run workflow, sem precisar
+  # de um commit novo.
+  workflow_dispatch:
+  
+# Environment
+env:
+  CI: true
+  PYTHON_VERSION: 3.12
+
+# O job precisa escrever na branch gh-pages.
+# Isto só tem efeito se, em Settings > Actions > General > Workflow permissions,
+# a opção "Read and write permissions" estiver marcada.
+permissions:
+  contents: write
+
+# Jobs to run
+jobs:
+     
+  # Build and deploy documentation site
+  deploy:
+    if: github.event_name != 'pull_request' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    steps:
+
+      # Checkout source from GitHub.
+      # fetch-depth: 0 traz o histórico completo — sem ele os plugins git-authors e
+      # git-revision-date-localized não conseguem datar as páginas.
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      # Install Python runtime and dependencies
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+
+      # pip
+      - run: |
+          pip install -r requirements.txt
+          
+      # deploy
+      - run: |
+          mkdocs gh-deploy --force
