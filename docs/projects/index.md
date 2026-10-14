@@ -12,7 +12,7 @@ three parts over the semester.
 | Full name | GitHub |
 |-----------|--------|
 | Alex Chequer | [AlexChequer](https://github.com/AlexChequer) |
-| | [Lucasikawa](https://github.com/Lucasikawa) |
+| Lucas Ikawa | [Lucasikawa](https://github.com/Lucasikawa) |
 | Carlos Hernani Cardoso | [carloshernanic](https://github.com/carloshernanic) |
 
 ## The three deliverables

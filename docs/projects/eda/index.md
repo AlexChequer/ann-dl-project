@@ -4,7 +4,7 @@ task: regression
 dataset: https://www.kaggle.com/datasets/dgomonov/new-york-city-airbnb-open-data
 team:
   - Alex Chequer
-  - Lucasikawa
+  - Lucas Ikawa
   - Carlos Hernani Cardoso
 ai_use: "Claude (Anthropic) helped write the scripts in code/ and draft the text; every number and decision was reviewed by the team."
 ---
@@ -16,7 +16,7 @@ ai_use: "Claude (Anthropic) helped write the scripts in code/ and draft the text
     | Full name | GitHub |
     |-----------|--------|
     | Alex Chequer | [AlexChequer](https://github.com/AlexChequer) |
-    | | [Lucasikawa](https://github.com/Lucasikawa) |
+    | Lucas Ikawa | [Lucasikawa](https://github.com/Lucasikawa) |
     | Carlos Hernani Cardoso | [carloshernanic](https://github.com/carloshernanic) |
 
     Dataset, decisions and status: [project page](../index.md).
@@ -270,9 +270,31 @@ Among the boroughs, Manhattan is clearly above the other four, which overlap a l
 `room_type`, training set (outliers not drawn).
 ///
 
-<!-- interpret Figure 7: difference in location (median) and spread (IQR) between the
-3 room types, for each of the 3 features, and end with an explicit conclusion.
-The numbers are in code/eda_numbers.json → "num_cat". -->
+Each cell: median · IQR · std, training set. The IQR (Q3 − Q1) is computed with
+`load_split()`; median and std come from `eda_numbers.json`.
+
+| Feature | Entire home/apt (n = 20,322) | Private room (n = 17,868) | Shared room (n = 917) |
+|---------|-----------------------------:|--------------------------:|----------------------:|
+| `availability_365` (days) | 42 · 228 · 129.9 | 46 · 216 · 132.3 | **89 · 341** · 150.8 |
+| `minimum_nights` (nights) | **3** · 3 · 19.8 | 2 · 3 · 14.7 | 1 · 2 · 16.7 |
+| `calculated_host_listings_count` | 1 · 1 · **43.6** | 1 · 1 · 10.1 | **2 · 5** · 5.9 |
+
+- **`availability_365`:** entire homes and private rooms are almost identical (median 42
+  vs. 46 days, IQR 228 vs. 216, both with Q1 = 0), while shared rooms are open longer and
+  vary more (median 89, IQR 341).
+- **`minimum_nights`:** the median drops as the space gets less private (3 → 2 → 1 nights)
+  and the IQR is narrow in all three groups (2–3 nights); the std (14.7–19.8) is 5–8× the
+  IQR only because every group keeps the tail up to 365 nights.
+- **`calculated_host_listings_count`:** entire homes and private rooms have median 1 and
+  IQR 1 (mostly single-listing hosts), shared rooms median 2 and IQR 5. The std ranks the
+  other way (43.6 > 10.1 > 5.9) because the largest hosts (up to 327 listings) offer entire
+  homes and private rooms, while no shared-room host has more than 34.
+
+**Conclusion:** `room_type` barely shifts these three features — entire homes and private
+rooms overlap almost completely, differing by one night in median minimum stay — so they
+carry information that `room_type` does not; only the rare shared room (2.34%) stands out,
+with more availability, shorter minimum stays and larger hosts. For the two counts, the std
+far above the IQR is the long tail again, which supports the clip + `log1p` of Stage 4A.
 
 ## 4. Preprocessing
 
