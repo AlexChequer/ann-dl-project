@@ -1,55 +1,51 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
     <url>
-         <loc>https://repo-classes.github.io/ann-dl/</loc>
+         <loc>https://alexchequer.github.io/ann-dl-project/</loc>
          <lastmod>2026-10-14</lastmod>
     </url>
     <url>
-         <loc>https://repo-classes.github.io/ann-dl/examples/</loc>
+         <loc>https://alexchequer.github.io/ann-dl-project/examples/</loc>
          <lastmod>2026-10-14</lastmod>
     </url>
     <url>
-         <loc>https://repo-classes.github.io/ann-dl/examples/notebook/data-exercise-1/</loc>
+         <loc>https://alexchequer.github.io/ann-dl-project/examples/notebook/data-exercise-1/</loc>
          <lastmod>2026-10-14</lastmod>
     </url>
     <url>
-         <loc>https://repo-classes.github.io/ann-dl/exercises/data/</loc>
+         <loc>https://alexchequer.github.io/ann-dl-project/exercises/data/</loc>
          <lastmod>2026-10-14</lastmod>
     </url>
     <url>
-         <loc>https://repo-classes.github.io/ann-dl/exercises/mlp/</loc>
+         <loc>https://alexchequer.github.io/ann-dl-project/exercises/mlp/</loc>
          <lastmod>2026-10-14</lastmod>
     </url>
     <url>
-         <loc>https://repo-classes.github.io/ann-dl/exercises/perceptron/</loc>
+         <loc>https://alexchequer.github.io/ann-dl-project/exercises/perceptron/</loc>
          <lastmod>2026-10-14</lastmod>
     </url>
     <url>
-         <loc>https://repo-classes.github.io/ann-dl/exercises/vae/</loc>
+         <loc>https://alexchequer.github.io/ann-dl-project/exercises/vae/</loc>
          <lastmod>2026-10-14</lastmod>
     </url>
     <url>
-         <loc>https://repo-classes.github.io/ann-dl/projects/</loc>
+         <loc>https://alexchequer.github.io/ann-dl-project/projects/</loc>
          <lastmod>2026-10-14</lastmod>
     </url>
     <url>
-         <loc>https://repo-classes.github.io/ann-dl/projects/classification/</loc>
+         <loc>https://alexchequer.github.io/ann-dl-project/projects/eda/</loc>
          <lastmod>2026-10-14</lastmod>
     </url>
     <url>
-         <loc>https://repo-classes.github.io/ann-dl/projects/eda/</loc>
+         <loc>https://alexchequer.github.io/ann-dl-project/projects/generative/</loc>
          <lastmod>2026-10-14</lastmod>
     </url>
     <url>
-         <loc>https://repo-classes.github.io/ann-dl/projects/generative/</loc>
+         <loc>https://alexchequer.github.io/ann-dl-project/projects/regression/</loc>
          <lastmod>2026-10-14</lastmod>
     </url>
     <url>
-         <loc>https://repo-classes.github.io/ann-dl/projects/regression/</loc>
-         <lastmod>2026-10-14</lastmod>
-    </url>
-    <url>
-         <loc>https://repo-classes.github.io/ann-dl/template/</loc>
+         <loc>https://alexchequer.github.io/ann-dl-project/template/</loc>
          <lastmod>2026-10-14</lastmod>
     </url>
 </urlset>
