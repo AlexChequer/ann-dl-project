@@ -1,7 +1,7 @@
-"""Etapas 1 a 3: números do relatório e Figuras 1 a 7.
+"""Stages 1 to 3: report numbers and Figures 1 to 7.
 
-Rodar da raiz do repositório:  python docs/projects/eda/code/eda_figures.py
-Toda análise de distribuição usa apenas o conjunto de TREINO.
+Run from the repository root:  python docs/projects/eda/code/eda_figures.py
+Every distribution analysis uses the TRAINING set only.
 """
 
 import json
@@ -54,12 +54,12 @@ def stage1_target(y_train):
     log_y = np.log1p(y_train)
     fig, axes = plt.subplots(1, 2, figsize=(11, 4))
     axes[0].hist(y_train, bins=100, color="#4C72B0", label="price")
-    axes[0].set(title="price (US$/noite)", xlabel="price (US$)", ylabel="frequência")
+    axes[0].set(title="price (US$/night)", xlabel="price (US$)", ylabel="frequency")
     axes[1].hist(log_y, bins=60, color="#DD8452", label="log1p(price)")
-    axes[1].set(title="log1p(price)", xlabel="log1p(price)", ylabel="frequência")
+    axes[1].set(title="log1p(price)", xlabel="log1p(price)", ylabel="frequency")
     for ax in axes:
         ax.legend()
-    fig.suptitle("Figura 1 — Distribuição do alvo no treino")
+    fig.suptitle("Figure 1 — Target distribution (train)")
     save(fig, "fig01-target.png")
     return {
         "mean": round(y_train.mean(), 2), "median": float(y_train.median()),
@@ -74,13 +74,13 @@ def stage2_numeric(X_train):
     fig, axes = plt.subplots(2, 4, figsize=(15, 6.5))
     for ax, col in zip(axes.flat, NUM_COLS):
         ax.hist(X_train[col].dropna(), bins=60, color="#4C72B0", label=col)
-        ax.set(title=col, xlabel=col, ylabel="frequência")
+        ax.set(title=col, xlabel=col, ylabel="frequency")
         if X_train[col].skew() > 3:
             ax.set_yscale("log")
-            ax.set_ylabel("frequência (log)")
+            ax.set_ylabel("frequency (log)")
         ax.legend(fontsize=7)
     axes.flat[-1].axis("off")
-    fig.suptitle("Figura 2 — Histogramas das features numéricas (treino)")
+    fig.suptitle("Figure 2 — Histograms of the numerical features (train)")
     save(fig, "fig02-numeric-hist.png")
     desc = X_train[NUM_COLS].describe().T
     desc["skew"] = X_train[NUM_COLS].skew()
@@ -92,17 +92,17 @@ def stage2_categorical(X_train):
                              gridspec_kw={"width_ratios": [1, 1, 2]})
     for ax, col in zip(axes[:2], ["neighbourhood_group", "room_type"]):
         counts = X_train[col].value_counts()
-        ax.bar(counts.index, counts.values, color="#55A868", label="anúncios")
-        ax.set(title=col, xlabel=col, ylabel="nº de anúncios")
+        ax.bar(counts.index, counts.values, color="#55A868", label="listings")
+        ax.set(title=col, xlabel=col, ylabel="number of listings")
         ax.tick_params(axis="x", rotation=30)
         ax.legend()
     top = X_train["neighbourhood"].value_counts().head(TOP_NEIGHBOURHOODS)
-    axes[2].barh(top.index[::-1], top.values[::-1], color="#8172B3", label="anúncios")
-    axes[2].set(title=f"neighbourhood (top {TOP_NEIGHBOURHOODS} de "
+    axes[2].barh(top.index[::-1], top.values[::-1], color="#8172B3", label="listings")
+    axes[2].set(title=f"neighbourhood (top {TOP_NEIGHBOURHOODS} of "
                 f"{X_train['neighbourhood'].nunique()})",
-                xlabel="nº de anúncios", ylabel="neighbourhood")
+                xlabel="number of listings", ylabel="neighbourhood")
     axes[2].legend()
-    fig.suptitle("Figura 3 — Frequência das categóricas (treino)")
+    fig.suptitle("Figure 3 — Categorical frequencies (train)")
     save(fig, "fig03-categorical-bars.png")
     nb = X_train["neighbourhood"].value_counts()
     return {
@@ -121,24 +121,24 @@ def stage3_correlation(train):
     corr = train[cols].corr(method="spearman")
     fig, ax = plt.subplots(figsize=(8.5, 7))
     sns.heatmap(corr, annot=True, fmt=".2f", cmap="RdBu_r", vmin=-1, vmax=1, ax=ax,
-                cbar_kws={"label": "ρ de Spearman"})
-    ax.set(title="Figura 4 — Correlação de Spearman (treino)", xlabel="feature",
+                cbar_kws={"label": "Spearman ρ"})
+    ax.set(title="Figure 4 — Spearman correlation (train)", xlabel="feature",
            ylabel="feature")
     save(fig, "fig04-spearman.png")
 
     sample = train.sample(SCATTER_SAMPLE, random_state=SEED)
     fig, axes = plt.subplots(1, 2, figsize=(12, 4.5))
     axes[0].scatter(sample["number_of_reviews"], sample["reviews_per_month"], s=5,
-                    alpha=0.4, label=f"amostra de {SCATTER_SAMPLE}")
+                    alpha=0.4, label=f"sample of {SCATTER_SAMPLE}")
     axes[0].set(xscale="symlog", yscale="symlog", xlabel="number_of_reviews",
-                ylabel="reviews_per_month", title="reviews: total × por mês")
+                ylabel="reviews_per_month", title="reviews: total × per month")
     axes[1].scatter(sample["longitude"], sample["latitude"], s=5, alpha=0.5,
                     c=np.log1p(sample[TARGET]), cmap="viridis",
-                    label="cor = log1p(price)")
-    axes[1].set(xlabel="longitude", ylabel="latitude", title="posição × preço")
+                    label="color = log1p(price)")
+    axes[1].set(xlabel="longitude", ylabel="latitude", title="location × price")
     for ax in axes:
         ax.legend(loc="upper left")
-    fig.suptitle("Figura 5 — Dispersão de pares numéricos (treino)")
+    fig.suptitle("Figure 5 — Scatter of numerical pairs (train)")
     save(fig, "fig05-scatter.png")
 
     pairs = corr.drop(index=TARGET, columns=TARGET).abs().where(
@@ -160,9 +160,9 @@ def stage3_cat_target(train):
         order = data.groupby(col)["log1p(price)"].median().sort_values().index
         sns.boxplot(data=data, x=col, y="log1p(price)", order=order, ax=ax,
                     hue=col, legend=True, showfliers=False)
-        ax.set(title=f"log1p(price) por {col}", xlabel=col, ylabel="log1p(price)")
+        ax.set(title=f"log1p(price) by {col}", xlabel=col, ylabel="log1p(price)")
         ax.tick_params(axis="x", rotation=20)
-    fig.suptitle("Figura 6 — Distribuição do alvo por categoria (treino)")
+    fig.suptitle("Figure 6 — Target distribution by category (train)")
     save(fig, "fig06-target-by-category.png")
     stats = {}
     for col in ["room_type", "neighbourhood_group"]:
@@ -179,9 +179,9 @@ def stage3_num_cat(train):
                               "calculated_host_listings_count"]):
         sns.boxplot(data=train, x="room_type", y=col, hue="room_type", legend=True,
                     ax=ax, showfliers=False)
-        ax.set(title=f"{col} por room_type", xlabel="room_type", ylabel=col)
+        ax.set(title=f"{col} by room_type", xlabel="room_type", ylabel=col)
         ax.tick_params(axis="x", rotation=20)
-    fig.suptitle("Figura 7 — Numéricas por room_type (treino, sem outliers no desenho)")
+    fig.suptitle("Figure 7 — Numerical features by room_type (train, outliers not drawn)")
     save(fig, "fig07-numeric-by-room-type.png")
     cols = ["availability_365", "minimum_nights", "calculated_host_listings_count"]
     g = train.groupby("room_type")[cols]

@@ -1,6 +1,6 @@
-"""Carga, limpeza, split e pipeline de pré-processamento — NYC Airbnb 2019.
+"""Loading, cleaning, split and preprocessing pipeline — NYC Airbnb 2019.
 
-Uso a partir da raiz do repositório:
+Usage from the repository root:
 
     from docs.projects.eda.code.pipeline import load_split, build_preprocessor
     X_train, X_test, y_train, y_test = load_split()
@@ -23,9 +23,9 @@ from sklearn.preprocessing import (
 
 SEED = 42
 TEST_SIZE = 0.2
-N_PRICE_BINS = 5            # estratos de log(price) para estratificar o split
-MAX_MINIMUM_NIGHTS = 365    # mais de um ano de estadia mínima é inconsistente
-MIN_NEIGHBOURHOOD_FREQ = 50  # bairros mais raros viram "infrequent"
+N_PRICE_BINS = 5            # log(price) strata used to stratify the split
+MAX_MINIMUM_NIGHTS = 365    # a minimum stay longer than a year is inconsistent
+MIN_NEIGHBOURHOOD_FREQ = 50  # rarer neighbourhoods become "infrequent"
 CLIP_QUANTILE = 0.99
 
 DATA_PATH = Path(__file__).resolve().parents[4] / "data" / "AB_NYC_2019.csv"
@@ -34,7 +34,7 @@ TARGET = "price"
 DROP_COLS = ["id", "name", "host_id", "host_name", "last_review"]
 CAT_COLS = ["neighbourhood_group", "neighbourhood", "room_type"]
 GEO_COLS = ["latitude", "longitude"]
-# Contagens com cauda longa: recebem clip no p99 do treino + log1p
+# Long-tailed counts: clipped at the train p99 + log1p
 SKEWED_COLS = [
     "minimum_nights",
     "number_of_reviews",
@@ -46,14 +46,14 @@ NUM_COLS = GEO_COLS + SKEWED_COLS + BOUNDED_COLS
 
 
 def load_raw(path=DATA_PATH):
-    """Lê o CSV original, sem nenhuma alteração."""
+    """Read the original CSV, unchanged."""
     return pd.read_csv(path)
 
 
 def clean(df):
-    """Remove linhas com alvo impossível (price == 0) e colunas descartadas.
+    """Remove rows with an impossible target (price == 0) and the dropped columns.
 
-    Não usa estatística nenhuma do conjunto — é seguro antes do split.
+    Uses no statistic from the data, so it is safe before the split.
     """
     kept = df.loc[df[TARGET] > 0]
     capped = kept.assign(
@@ -63,7 +63,7 @@ def clean(df):
 
 
 def split(df):
-    """Split 80/20 estratificado por quintil de log(price)."""
+    """80/20 split stratified by log(price) quintile."""
     X = df.drop(columns=[TARGET])
     y = df[TARGET]
     strata = pd.qcut(np.log1p(y), q=N_PRICE_BINS, labels=False, duplicates="drop")
@@ -73,12 +73,12 @@ def split(df):
 
 
 def load_split(path=DATA_PATH):
-    """Atalho: carga + limpeza + split. Retorna X_train, X_test, y_train, y_test."""
+    """Shortcut: load + clean + split. Returns X_train, X_test, y_train, y_test."""
     return split(clean(load_raw(path)))
 
 
 class QuantileClipper:
-    """Corta cada coluna no quantil superior aprendido no fit (só no treino)."""
+    """Clip each column at the upper quantile learned in fit (train only)."""
 
     def __init__(self, q=CLIP_QUANTILE):
         self.q = q
@@ -102,9 +102,9 @@ class QuantileClipper:
 
 
 def build_preprocessor():
-    """ColumnTransformer com todas as decisões da Etapa 4A."""
+    """ColumnTransformer with every decision from Stage 4A."""
     skewed = Pipeline([
-        # reviews_per_month é NaN exatamente quando number_of_reviews == 0
+        # reviews_per_month is NaN exactly when number_of_reviews == 0
         ("impute", SimpleImputer(strategy="constant", fill_value=0)),
         ("clip", QuantileClipper()),
         ("log", FunctionTransformer(np.log1p, feature_names_out="one-to-one")),
@@ -124,7 +124,7 @@ def build_preprocessor():
 
 
 def transform_target(y):
-    """Alvo do modelo: log1p(price)."""
+    """Model target: log1p(price)."""
     return np.log1p(y)
 
 

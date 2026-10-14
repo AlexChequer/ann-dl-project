@@ -1,6 +1,6 @@
-"""Etapa 4: pipeline ajustado, contagem de outliers e Figuras 8 a 10.
+"""Stage 4: fitted pipeline, outlier count and Figures 8 to 10.
 
-Rodar da raiz do repositório:  python docs/projects/eda/code/dimred.py
+Run from the repository root:  python docs/projects/eda/code/dimred.py
 """
 
 import json
@@ -37,14 +37,14 @@ def save(fig, name):
 
 def scatter(ax, emb, color, title, xlabel, ylabel):
     pts = ax.scatter(emb[:, 0], emb[:, 1], c=color, cmap="viridis", s=4, alpha=0.6,
-                     label="anúncio (cor = log1p(price))")
+                     label="listing (color = log1p(price))")
     ax.set(title=title, xlabel=xlabel, ylabel=ylabel)
     ax.legend(loc="upper right", fontsize=7, markerscale=3)
     return pts
 
 
 def outlier_rows(X_train):
-    # Mesma ordem do pipeline: imputa 0 antes de calcular o p99
+    # Same order as the pipeline: impute 0 before computing the p99
     skewed = X_train[SKEWED_COLS].fillna(0)
     return int((skewed > skewed.quantile(CLIP_QUANTILE)).any(axis=1).sum())
 
@@ -54,16 +54,16 @@ def run_pca(Xt, names, color, idx):
     cum = np.cumsum(pca.explained_variance_ratio_)
     emb = pca.transform(Xt[idx])[:, :2]
     fig, axes = plt.subplots(1, 2, figsize=(12, 4.5))
-    axes[0].plot(np.arange(1, len(cum) + 1), cum, marker=".", label="acumulada")
+    axes[0].plot(np.arange(1, len(cum) + 1), cum, marker=".", label="cumulative")
     axes[0].axhline(0.9, ls="--", c="grey", label="90%")
-    axes[0].set(title="Variância explicada acumulada", xlabel="nº de componentes",
-                ylabel="fração da variância")
+    axes[0].set(title="Cumulative explained variance", xlabel="number of components",
+                ylabel="fraction of variance")
     axes[0].legend()
     pts = scatter(axes[1], emb, color, "PCA — PC1 × PC2",
                   f"PC1 ({100 * pca.explained_variance_ratio_[0]:.1f}%)",
                   f"PC2 ({100 * pca.explained_variance_ratio_[1]:.1f}%)")
     fig.colorbar(pts, ax=axes[1], label="log1p(price)")
-    fig.suptitle("Figura 8 — PCA das features escaladas (treino)")
+    fig.suptitle("Figure 8 — PCA of the scaled features (train)")
     save(fig, "fig08-pca.png")
     loadings = pd.DataFrame(pca.components_[:2].T, index=names, columns=["PC1", "PC2"])
     top = {pc: loadings[pc].abs().sort_values(ascending=False).head(N_TOP_LOADINGS)
@@ -90,7 +90,7 @@ def run_nonlinear(Xs, color, kind, params, fig_no, fname):
         emb = model.fit_transform(Xs)
         pts = scatter(ax, emb, color, f"{kind} ({label})", f"{kind} 1", f"{kind} 2")
     fig.colorbar(pts, ax=axes, label="log1p(price)")
-    fig.suptitle(f"Figura {fig_no} — {kind} em amostra de {len(Xs)} anúncios do treino")
+    fig.suptitle(f"Figure {fig_no} — {kind} on a sample of {len(Xs)} train listings")
     fig.savefig(FIG_DIR / fname, dpi=110)
     plt.close(fig)
 
