@@ -39,7 +39,7 @@ precisa resolver.
 
 ## 3. Limpeza e normalização
 
-Execute o plano de pré-processamento definido no [EDA](../eda/index.md#8-plano-de-pre-processamento)
+Execute o plano de pré-processamento definido no [EDA](../eda/index.md#a-strategies)
 e relate o que mudou em relação ao planejado — e por quê.
 
 !!! note "Escala do alvo"

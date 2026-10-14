@@ -17,9 +17,9 @@ ao longo do semestre, cada uma com data e peso próprios.
 
 | Nome completo | E-mail | GitHub |
 |---------------|--------|--------|
-| | | |
-| | | |
-| | | |
+| Alex Chequer | | [AlexChequer](https://github.com/AlexChequer) |
+| | | [Lucasikawa](https://github.com/Lucasikawa) |
+| | | [carloshernanic](https://github.com/carloshernanic) |
 
 Times de 2 a 3 pessoas. Repita esses nomes no cabeçalho de cada entrega — quem corrige pode
 abrir uma página sozinha, sem passar por aqui.
@@ -29,7 +29,7 @@ abrir uma página sozinha, sem passar por aqui.
 | # | Entrega | Página |
 |---|---------|--------|
 | 1 | EDA | [EDA](eda/index.md) |
-| 2 | Classificação **ou** Regressão | [Classificação](classification/index.md) · [Regressão](regression/index.md) |
+| 2 | Classificação **ou** Regressão | [Regressão](regression/index.md) |
 | 3 | Generativo | [Generativo](generative/index.md) |
 
 Datas e pesos são da sua edição — veja o
@@ -54,21 +54,23 @@ duas viáveis.
 
 | | |
 |---|---|
-| **Nome** | |
-| **Fonte (URL)** | |
-| **Licença / termos de uso** | |
-| **Amostras** | |
-| **Features** | |
-| **Variável alvo** | |
-| **Tarefa escolhida** | Classificação ou Regressão |
+| **Nome** | New York City Airbnb Open Data (`AB_NYC_2019.csv`) |
+| **Fonte (URL)** | <https://www.kaggle.com/datasets/dgomonov/new-york-city-airbnb-open-data> (dados do Inside Airbnb) |
+| **Licença / termos de uso** | CC0 1.0 (domínio público) |
+| **Amostras** | 48.895 anúncios (48.884 após remover `price == 0`) |
+| **Features** | 16 colunas no CSV; 7 numéricas + 3 categóricas usadas no modelo |
+| **Variável alvo** | `price` — diária em US$ (modelada como `log1p(price)`) |
+| **Tarefa escolhida** | Regressão |
 
-Justifique em 3–5 linhas: por que este dataset, e o que nele torna a tarefa escolhida
-interessante em vez de trivial.
+Prever a diária de um anúncio a partir de onde ele está, que tipo de espaço oferece e do seu
+histórico de reviews/disponibilidade. Não é trivial: o alvo tem cauda muito longa (até
+US$ 10.000), a localização tem 220 bairros com muitos raros, e nenhuma feature numérica
+sozinha explica bem o preço (maior |ρ| = 0,44). O CSV está versionado em `data/`.
 
 ## Status
 
-- [ ] **1. EDA**
-- [ ] **2. Classificação ou Regressão**
+- [x] **1. EDA**
+- [ ] **2. Regressão**
 - [ ] **3. Generativo**
 
 ## Registro de decisões
@@ -79,4 +81,6 @@ projeto.
 
 | Data | Decisão | Motivo |
 |------|---------|--------|
-| | | |
+| 2026-10-14 | Dataset NYC Airbnb 2019, regressão de `price` | ver EDA |
+| 2026-10-14 | Alvo modelado como `log1p(price)` | assimetria 19,22 → 0,64 |
+| 2026-10-14 | Pipeline em `docs/projects/eda/code/pipeline.py` reutilizado nas próximas entregas | fit só no treino, 102 features |

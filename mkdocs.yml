@@ -5,11 +5,11 @@
 #  ANTES DE PUBLICAR: troque todas as linhas marcadas com "# TROCAR" abaixo.
 #  Passo a passo em docs/template/index.md > Publicação no GitHub Pages.
 # =============================================================================
-site_name: ANN-DL · Entregas                  # TROCAR: título exibido no topo do site
-site_author: Seu Nome, Sobrenome              # TROCAR: seu nome (ou os nomes do grupo)
-site_url: https://repo-classes.github.io/ann-dl    # TROCAR: https://<seu-usuario>.github.io/<seu-repo>
-repo_url: https://github.com/repo-classes/ann-dl/   # TROCAR: https://github.com/<seu-usuario>/<seu-repo>
-repo_name: repo-classes/ann-dl                     # TROCAR: <seu-usuario>/<seu-repo>
+site_name: ANN-DL · Projeto NYC Airbnb
+site_author: Alex Chequer, Lucasikawa, carloshernanic
+site_url: https://alexchequer.github.io/ann-dl-project
+repo_url: https://github.com/AlexChequer/ann-dl-project/
+repo_name: AlexChequer/ann-dl-project
 
 theme:
   name: material
@@ -155,8 +155,6 @@ nav:
   - Projeto:
     - projects/index.md
     - 1. EDA: projects/eda/index.md
-    # Escolha UMA das duas linhas abaixo, e apague a outra (e a pasta que sobrar):
-    - 2. Classificação: projects/classification/index.md
     - 2. Regressão: projects/regression/index.md
     - 3. Generativo: projects/generative/index.md
 
@@ -165,6 +163,6 @@ nav:
     - Como montar o menu: examples/index.md
     - Notebook no menu: examples/notebook/data-exercise-1.ipynb
     # TROCAR "usuario/ann-dl" pelo seu repositório, senão o link abre o notebook de outra pessoa:
-    - Abrir no Colab ↗: https://colab.research.google.com/github/usuario/ann-dl/blob/main/docs/examples/notebook/data-exercise-1.ipynb
+    - Abrir no Colab ↗: https://colab.research.google.com/github/AlexChequer/ann-dl-project/blob/main/docs/examples/notebook/data-exercise-1.ipynb
 
   - Enunciados da disciplina ↗: https://insper.github.io/ann-dl/

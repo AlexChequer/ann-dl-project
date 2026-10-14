@@ -2,7 +2,7 @@
 
 ???+ info inline end "Edição"
 
-    **20XX.X** <!-- TROCAR -->
+    **2026.2**
 
     [Enunciados :material-open-in-new:](https://insper.github.io/ann-dl/){:target='_blank'}
 
@@ -51,8 +51,8 @@ Quem responde por este repositório. Os **exercícios são individuais**; a equi
 
 Um projeto, um dataset, três entregas:
 
-- [ ] [EDA](projects/eda/index.md)
-- [ ] [Classificação](projects/classification/index.md) **ou** [Regressão](projects/regression/index.md)
+- [x] [EDA](projects/eda/index.md)
+- [ ] [Regressão](projects/regression/index.md)
 - [ ] [Generativo](projects/generative/index.md)
 
 ## Checklist antes de cada entrega
