@@ -1,0 +1,44 @@
+{
+  "outlier_rows_train": 1345,
+  "outlier_rows_pct": 3.44,
+  "clip_upper": {
+    "minimum_nights": 45.0,
+    "number_of_reviews": 214.0,
+    "reviews_per_month": 6.86,
+    "calculated_host_listings_count": 232.0
+  },
+  "shape_train": [
+    39107,
+    102
+  ],
+  "shape_test": [
+    9777,
+    102
+  ],
+  "nan_train": 0,
+  "nan_test": 0,
+  "n_numeric": 7,
+  "n_onehot": 95,
+  "pca": {
+    "pc1_pct": 22.37,
+    "pc2_pct": 17.76,
+    "pc1_pc2_pct": 40.14,
+    "n_components_90": 11,
+    "top_loadings": {
+      "PC1": [
+        "reviews_per_month (+0.61)",
+        "number_of_reviews (+0.59)",
+        "minimum_nights (-0.40)",
+        "longitude (+0.22)",
+        "calculated_host_listings_count (-0.20)"
+      ],
+      "PC2": [
+        "availability_365 (+0.62)",
+        "calculated_host_listings_count (+0.60)",
+        "minimum_nights (+0.38)",
+        "reviews_per_month (+0.20)",
+        "number_of_reviews (+0.18)"
+      ]
+    }
+  }
+}
