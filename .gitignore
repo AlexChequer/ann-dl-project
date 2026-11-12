@@ -3,5 +3,6 @@ env/
 .cache/
 .vscode/
 target/__pycache__/
+__pycache__/
 .env
 .env.*

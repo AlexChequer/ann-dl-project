@@ -53,3 +53,6 @@ feature explains price well (largest |ρ| = 0.44). The CSV is versioned in `data
 | 2026-10-14 | Dataset NYC Airbnb 2019, regression on `price` | see EDA |
 | 2026-10-14 | Target modeled as `log1p(price)` | skewness 19.22 → 0.64 |
 | 2026-10-14 | Pipeline in `docs/projects/eda/code/pipeline.py` reused in the next deliverables | fit on train only, 102 features |
+| 2026-11-12 | Validation = 20% of the EDA training set (31,285 / 7,822 / 9,777 rows); preprocessor refitted on the new training set → 91 features | choices made on validation; test used once |
+| 2026-11-12 | Main metric MAE in US$; success = network MAE at least 5% below the best baseline on the test set | RMSE and R² in US$ are dominated by the price tail |
+| 2026-11-12 | MLP in PyTorch, Huber loss on `log1p(price)` | robust to the tail left after the log |

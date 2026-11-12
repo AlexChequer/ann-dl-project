@@ -18,3 +18,6 @@ matplotlib
 scikit-learn
 seaborn
 umap-learn
+# PyTorch só CPU: sem este índice, o pip no Linux (CI) baixa a versão com CUDA (~2 GB)
+--extra-index-url https://download.pytorch.org/whl/cpu
+torch
