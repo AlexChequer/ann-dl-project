@@ -26,10 +26,15 @@ ai_use: "Claude (Anthropic) helped write the scripts in code/ and draft the text
 ```shell
 python docs/projects/regression/code/baselines.py   # Stage 1: baselines_numbers.json
 python docs/projects/regression/code/train.py       # Stages 2–3: Figures 1–2 and train_numbers.json
+python docs/projects/regression/code/search.py      # Stage 4: Figure 3, search_numbers.json, best_config.json
+python docs/projects/regression/code/evaluate.py    # Stage 5, development run on validation (writes nothing)
+python docs/projects/regression/code/evaluate.py --split test  # Stage 5: the test run — Figures 4–5,
+                                                               # test_numbers.json, test_predictions.csv
 ```
 
 Every number in the text comes from these scripts. Seed 42 everywhere (split, weight
-initialization and batch order).
+initialization and batch order); Stages 4 and 5 repeat every training with seeds 42 to 46,
+on the same split.
 
 ## 0 · Starting point
 
@@ -233,18 +238,285 @@ set, in Stage 5.
 
 ## 4 · Regularization and hyperparameters
 
-<!-- ALEX. Two or more techniques (weight decay, dropout, BatchNorm) each compared with the
-base network of Stage 3 (validation MAE 55.57). Search of 8+ configurations chosen BY
-VALIDATION, in a table sorted by validation MAE. Script: code/search.py, writes
-code/search_numbers.json and code/best_config.json. -->
+Everything in this stage uses **train and validation only**:
+[`code/search.py`](https://github.com/AlexChequer/ann-dl-project/blob/main/docs/projects/regression/code/search.py)
+calls `load_data()` without the test set and trains every configuration with `train_model`
+from Stage 3 (same Huber loss, batch 256, early stopping with patience 15).
+
+**Five seeds per configuration, not one.** Stage 3 used a single seed. Repeating the base
+network with seeds 42 to 46 (the seed changes weight initialization and batch order; the
+split stays fixed) gives a validation MAE of **55.84 ± 0.21** (mean ± sample standard
+deviation). Most of the differences between configurations below are of a few tenths of a
+dollar — the same order as this standard deviation — so a single seed would rank noise.
+Every configuration is therefore trained 5 times and ranked by its **mean validation MAE**.
+(With seed 42 alone the base network gives 55.55 here against 55.57 in Stage 3, with the
+same best and stopping epochs, 18 and 33: the difference is floating-point arithmetic across
+machines.)
+
+??? example "code/search.py"
+
+    ```python
+    --8<-- "docs/projects/regression/code/search.py"
+    ```
+
+### 4A · Each regularization technique alone
+
+Same base network (128 → 64, learning rate 1e-3); **one change at a time**, two strengths
+for weight decay and for dropout:
+
+| Technique | Setting | Validation MAE (US$) | Δ vs base | Mean best epoch |
+|-----------|---------|---------------------:|----------:|----------------:|
+| None (base) | — | 55.84 ± 0.21 | — | 25.2 |
+| Weight decay (AdamW) | 0.01 | 55.81 ± 0.18 | −0.02 | 25.2 |
+| Weight decay (AdamW) | 0.1 | 55.65 ± 0.12 | −0.19 | 28.0 |
+| **Dropout** | **0.1** | **55.39 ± 0.23** | **−0.44** | 65.2 |
+| Dropout | 0.3 | 55.63 ± 0.25 | −0.21 | 96.6 |
+| BatchNorm | after each linear layer | 55.93 ± 0.35 | +0.10 | 24.4 |
+
+Why these settings: in `AdamW` the decay is decoupled from the gradient, and each step
+shrinks the weights by a factor of `lr × weight_decay` (1e-5 or 1e-4 per step here), so
+0.01 and 0.1 go from weak to moderate. Dropout 0.1 and 0.3 bracket the usual range for a
+network this narrow (64 units in the last hidden layer).
+
+**Reading.**
+
+- **Dropout is the only technique with a clear effect on its own**: 0.1 lowers the MAE by
+  0.44, about twice the seed standard deviation. It also makes training longer (best epoch
+  65.2 against 25.2): the noise it injects slows down the fit to the training set, and the
+  validation loss keeps improving for more epochs.
+- **More dropout is worse on this small network** (0.3: −0.21 only): removing 30% of 64
+  units takes away capacity the network needs. Section 4C shows that the same 0.3 works
+  well once the network is wider.
+- **Weight decay barely matters**: 0.01 changes the MAE by 0.02 (a tenth of the seed
+  standard deviation); 0.1 lowers it by 0.19, still within the noise.
+- **BatchNorm makes it slightly worse** (+0.10) and is the least stable of the six (std
+  0.35). The pipeline already standardizes every input and the network has only two hidden
+  layers, so there is no conditioning problem for BatchNorm to fix; what it adds is noise
+  from the batch statistics.
+- This agrees with Stage 3: the base network was **not limited by overfitting** (small gap
+  between the training and validation curves), so regularizing it changes little. Where
+  regularization matters is when the capacity grows: the 256 → 128 network without
+  regularization is the **worst** of all configurations below (56.13 ± 0.40; it peaks at
+  epoch 19.0), and with dropout 0.2 the same network drops to 55.38 ± 0.13.
+
+### 4B · The `availability_365 == 0` flag promised in the EDA
+
+The EDA found that 35.9% of the listings have `availability_365 == 0` and proposed testing a
+binary flag for them. Here the flag is appended as a 92nd column (`add_availability_flag`);
+it is 1 for **36.0%** of the training rows.
+
+| Model (validation) | Without the flag | With the flag | Δ MAE |
+|--------------------|-----------------:|--------------:|------:|
+| Base network (5 seeds) | 55.84 ± 0.21 | 55.93 ± 0.28 | +0.09 |
+| Ridge | 57.85 | 57.65 | −0.19 |
+
+**It does not help the network** (+0.09, inside the seed standard deviation), so it is
+**not used**. A plausible reason: `availability_365` is already an input, standardized, and
+0 is its minimum value, so a single ReLU unit can already isolate the listings at 0. Ridge
+cannot build that step on its own and gains 0.19. The baselines stay exactly as defined in
+Stage 1; with the flag, Ridge would be 0.19 better, which would only make the 5% criterion
+harder to meet.
+
+### 4C · Search
+
+**What varies:** learning rate (3e-4, 1e-3, 3e-3), width and depth (from one layer of 64 up to
+1024 → 512 → 256 and four hidden layers), and regularization (dropout 0 to 0.4, weight decay
+0.1, BatchNorm). **What stays fixed:** Huber loss, `AdamW`, batch 256, early stopping with
+patience 15, at most 200 epochs. **Selection rule, fixed before running:** the lowest mean
+validation MAE over the 5 seeds.
+
+The search ran in **two rounds**, both on validation:
+
+- **Round 1** (9 configurations), designed after 4A: wider and deeper networks combined with
+  dropout, the learning rate around the best of them, and BatchNorm and weight decay as
+  add-ons.
+- **Round 2** (4 configurations): the best of round 1 was the widest and most regularized
+  network of the grid (512 → 256 → 128, dropout 0.3) — at its edge — so the search went on
+  in that direction: more dropout, weight decay on top, one more layer, double the width.
+
+Together with the 6 configurations of 4A, **19 configurations** are ranked, each trained
+with 5 seeds (95 trainings). The flag of 4B is shown at the end, outside the ranking.
+
+| # | Configuration (hidden units · lr · regularization) | Origin | Parameters | Validation MAE (US$) | RMSE (US$) | R² (US$) | Mean best epoch |
+|--:|-----------------------------------------------------|--------|-----------:|---------------------:|-----------:|---------:|----------------:|
+| 1 | **512-256-128 · lr 0.001 · dropout 0.4** | round 2 | 211,457 | **55.09 ± 0.15** | 198.89 | 0.144 | 64.6 |
+| 2 | 512-256-128 · lr 0.001 · dropout 0.3 | round 1 | 211,457 | 55.09 ± 0.16 | 198.53 | 0.147 | 56.6 |
+| 3 | 256-128-64 · lr 0.001 · dropout 0.2 | round 1 | 64,769 | 55.17 ± 0.13 | 199.11 | 0.143 | 47.8 |
+| 4 | 1024-512-256 · lr 0.001 · dropout 0.3 | round 2 | 750,593 | 55.23 ± 0.32 | 198.94 | 0.144 | 46.0 |
+| 5 | 512-256-128 · lr 0.001 · dropout 0.3 · wd 0.1 | round 2 | 211,457 | 55.26 ± 0.22 | 198.01 | 0.152 | 47.8 |
+| 6 | 256-128-64 · lr 0.001 · dropout 0.1 · BatchNorm | round 1 | 65,665 | 55.28 ± 0.14 | 197.81 | 0.154 | 53.6 |
+| 7 | 512-256-128-64 · lr 0.001 · dropout 0.3 | round 2 | 219,649 | 55.32 ± 0.40 | 199.60 | 0.138 | 44.2 |
+| 8 | 256-128 · lr 0.001 · dropout 0.2 | round 1 | 56,577 | 55.38 ± 0.13 | 197.81 | 0.154 | 82.4 |
+| 9 | 128-64 · lr 0.001 · dropout 0.1 | 4A | 20,097 | 55.39 ± 0.23 | 198.63 | 0.147 | 65.2 |
+| 10 | 256-128 · lr 0.001 · dropout 0.2 · wd 0.1 | round 1 | 56,577 | 55.50 ± 0.25 | 198.72 | 0.146 | 51.0 |
+| 11 | 256-128 · lr 0.003 · dropout 0.2 | round 1 | 56,577 | 55.53 ± 0.26 | 198.61 | 0.147 | 38.2 |
+| 12 | 256-128 · lr 0.0003 · dropout 0.2 | round 1 | 56,577 | 55.54 ± 0.32 | 198.99 | 0.144 | 74.0 |
+| 13 | 128-64 · lr 0.001 · dropout 0.3 | 4A | 20,097 | 55.63 ± 0.25 | 198.54 | 0.147 | 96.6 |
+| 14 | 128-64 · lr 0.001 · wd 0.1 | 4A | 20,097 | 55.65 ± 0.12 | 198.30 | 0.149 | 28.0 |
+| 15 | 128-64 · lr 0.001 · wd 0.01 | 4A | 20,097 | 55.81 ± 0.18 | 198.10 | 0.151 | 25.2 |
+| 16 | 128-64 · lr 0.001 (base) | base | 20,097 | 55.84 ± 0.21 | 198.03 | 0.152 | 25.2 |
+| 17 | 64 · lr 0.001 | round 1 | 5,953 | 55.90 ± 0.16 | 198.41 | 0.149 | 49.8 |
+| 18 | 128-64 · lr 0.001 · BatchNorm | 4A | 20,481 | 55.93 ± 0.35 | 198.66 | 0.146 | 24.4 |
+| 19 | 256-128 · lr 0.001 | round 1 | 56,577 | 56.13 ± 0.40 | 198.05 | 0.152 | 19.0 |
+| — | 128-64 · lr 0.001 + `availability_365 == 0` flag | 4B | 20,225 | 55.93 ± 0.28 | 198.42 | 0.149 | 25.0 |
+
+![Search results](figures/fig03-search.png)
+/// caption
+**Figure 3** — Validation MAE (US$) of every configuration, mean ± standard deviation over
+5 seeds, sorted from best (top) to worst. Colors mark where each configuration comes from.
+Dashed line: Ridge on validation (57.85); dotted line: 5% below Ridge (54.96), the margin
+the Stage 0 criterion asks for on the test set.
+///
+
+**Reading Figure 3 and the table.**
+
+- **What wins is capacity *with* regularization.** The top 3 all have 3 hidden layers and
+  dropout of 0.2 or more. Without regularization, more width hurts: 256 → 128 alone is last
+  (56.13), and the same network with dropout 0.2 is eighth (55.38).
+- **The learning rate of Stage 3 holds.** Around 256 → 128 with dropout 0.2, both 3e-3
+  (55.53) and 3e-4 (55.54) are worse than 1e-3 (55.38).
+- **Round 2 found a plateau, which is why the search stops there.** Going from dropout 0.3
+  to 0.4 changes nothing (55.09 and 55.09). Doubling the width (55.23) or adding a fourth
+  layer (55.32) does not help and makes the result less stable (std 0.32 and 0.40).
+- **The choice is a tie.** By the rule, dropout 0.4 is first (55.086 against 55.095, see
+  `search_numbers.json`), but the gap is about 0.01 for a standard deviation of 0.15. The
+  two are equivalent and the rule decides.
+- **Gain over the base network: US$ 0.75** (55.84 → 55.09). The chosen network has 211,457
+  parameters for 31,285 training rows — more parameters than rows; dropout 0.4 and early
+  stopping are what keep it from memorizing the training set.
+- **Already on validation, the margin is short of 5%:** the chosen network is **4.77% below
+  Ridge** (57.85 → 55.09), to the left of the dashed line but not of the dotted one. Before
+  opening the test set, the expectation was therefore a borderline result.
+
+**Chosen configuration**, saved in `code/best_config.json` with only the keys that change
+with respect to `BASE_CONFIG`:
+
+```json
+{"hidden": [512, 256, 128], "dropout": 0.4}
+```
+
+That is, **3 hidden layers of 512 → 256 → 128 units** (ReLU, He initialization), **dropout
+0.4** after each hidden layer, no weight decay, no BatchNorm; `AdamW` with learning rate
+1e-3, batch 256, Huber loss, early stopping with patience 15.
 
 ## 5 · Test evaluation
 
-<!-- ALEX. Chosen configuration retrained and evaluated ONCE on the test set: MAE, RMSE, R²
-in US$. Table with the network, Dummy and Ridge on the same test set. Was the Stage 0
-criterion (MAE at least 5% below the best baseline) met? 3+ seeds (mean ± std). Mandatory
-figures: predicted × actual and residuals × predicted. Script: code/evaluate.py, writes
-code/test_numbers.json and code/test_predictions.csv. -->
+Script:
+[`code/evaluate.py`](https://github.com/AlexChequer/ann-dl-project/blob/main/docs/projects/regression/code/evaluate.py).
+
+**How the test set was used — once.**
+
+1. Everything was fixed **before** the test set was loaded: the configuration
+   (`best_config.json`, Stage 4), the seeds (42 to 46), the metrics, the figures and the
+   decision rule for the criterion (**mean test MAE over the 5 seeds** against the best
+   baseline's test MAE).
+2. The script was developed on validation: without arguments, `evaluate.py` runs the whole
+   evaluation on the validation set and writes nothing. That run reproduced Stage 4 exactly
+   (55.09 ± 0.15), which confirms that retraining is deterministic. The figure and CSV code
+   was also checked on validation predictions.
+3. Then the script ran **once** with `--split test` — the only time Stages 0 to 5 loaded
+   the test set (`load_data(with_test=True)`). **Nothing was changed after it** — no
+   configuration, seed, threshold or figure choice was influenced by the test set. Running
+   the command again reproduces the same numbers; it is not a new decision.
+
+**Protocol.** For each seed, the chosen network is trained from scratch on the **31,285
+training rows**, with early stopping on validation — the same protocol under which it was
+selected. It is not retrained on train + validation, because early stopping needs the
+validation set and the number of epochs would otherwise have to be guessed. Dummy and Ridge
+are refitted on the same training rows with their Stage 1 settings. All models are evaluated
+on the same **9,777 test listings**.
+
+??? example "code/evaluate.py"
+
+    ```python
+    --8<-- "docs/projects/regression/code/evaluate.py"
+    ```
+
+| Model (test set, 9,777 rows) | MAE (US$) | RMSE (US$) | R² (US$) | RMSE in log |
+|------------------------------|----------:|-----------:|---------:|------------:|
+| Dummy (mean) | 82.12 | 222.21 | −0.029 | 0.685 |
+| Ridge (best baseline) | 58.13 | 203.52 | 0.137 | 0.453 |
+| **MLP 512-256-128, dropout 0.4** (5 seeds) | **55.28 ± 0.08** | 202.18 ± 0.62 | 0.148 ± 0.005 | 0.436 ± 0.001 |
+
+| Seed | Test MAE (US$) | Below Ridge | Best epoch | Stopped at |
+|-----:|---------------:|------------:|-----------:|-----------:|
+| 42 | 55.23 | 4.99% | 69 | 84 |
+| 43 | 55.38 | 4.74% | 73 | 88 |
+| 44 | 55.36 | 4.77% | 74 | 89 |
+| 45 | 55.26 | 4.94% | 59 | 74 |
+| 46 | 55.19 | 5.06% | 48 | 63 |
+
+**Was the Stage 0 criterion met? No.** The criterion asks for a test MAE at least 5% below
+the best baseline: 0.95 × 58.13 = **US$ 55.22**. The network's mean test MAE is **55.28**,
+**4.90%** below Ridge — US$ 0.06 short of the threshold. Only one seed of the five (46,
+5.06%) passes on its own; picking it would mean choosing a seed by looking at the test set,
+so the decision stays on the mean, as fixed in advance. The criterion is not changed.
+
+**Is the gap to Ridge larger than the variation between seeds? Yes, by far.** The network
+is **US$ 2.85** better than Ridge in mean MAE, and the standard deviation across seeds is
+**US$ 0.08** — the gap is **34.6 times** the seed variation, and every one of the 5 seeds
+beats Ridge (the worst seed has 55.38 against 58.13). So the improvement is real with
+respect to training randomness; it is only smaller than the 5% we had asked for. The seed
+standard deviation measures only training randomness, not which listings happened to fall
+in the test set.
+
+**Validation and test agree.** On validation the chosen network was 4.77% below Ridge; on
+test it is 4.90%. Selecting 1 configuration out of 19 on validation did not produce an
+optimistic validation number that collapsed on test.
+
+**RMSE and R² tell a smaller story than MAE.** In RMSE the network gains little over Ridge
+(202.18 against 203.52) and R² in US$ stays low (0.148 against 0.137). Both are dominated by
+the luxury tail, as anticipated in Stage 0: the gain of the network is in the typical
+listing, which is what MAE measures. In log scale the gain is clearer (RMSE 0.436 against
+0.453).
+
+**Output for Stage 6.** `code/test_predictions.csv` has one row per test listing:
+`row_index` (row of `data/AB_NYC_2019.csv`, 0-based, to join with the raw features),
+`price_true`, `price_pred` (network, seed 42), `pred_ridge` and `pred_dummy`, all in US$.
+`code/test_numbers.json` holds every number of this section.
+
+![Predicted versus actual](figures/fig04-pred-vs-actual.png)
+/// caption
+**Figure 4** — Predicted × actual price on the test set (both axes in log scale), for the
+network (seed 42, left) and for Ridge (right). Each point is a listing; the dashed line is a
+perfect prediction.
+///
+
+**Reading Figure 4.**
+
+- Both clouds are **flatter than the diagonal**: cheap listings are overpredicted and
+  expensive ones underpredicted. That is what a model does when the features explain only
+  part of the price — it pulls predictions towards the middle.
+- Listings priced between US$ 1,000 and US$ 10,000 are predicted at a few hundred dollars by
+  **both** models. The EDA had already found that no feature identifies them, so neither
+  model can.
+- The network's cloud reaches higher predictions than Ridge's (its highest test prediction is
+  US$ 984.94): it can combine location and room type nonlinearly, while Ridge only adds
+  their effects in log scale.
+
+![Residuals versus predicted](figures/fig05-residuals.png)
+/// caption
+**Figure 5** — Residual (actual − predicted price, US$) × predicted price, test set, network
+with seed 42. The y axis is linear between −100 and +100 and logarithmic beyond; the x axis
+is logarithmic. Red: median residual per quintile of the predicted price; orange: mean
+residual per quintile.
+///
+
+**Reading Figure 5.**
+
+- **The network is unbiased for the typical listing.** The median residual per predicted
+  quintile stays between **−2.98 and +3.59 US$**, and the overall median residual is
+  **−1.00 US$**, with **48.9%** of the listings underpredicted. That is the expected
+  behaviour of a model trained on `log1p(price)`: back on the US$ scale, its prediction
+  behaves like a conditional median, which is what minimizes MAE.
+- **The mean tells a different story:** the mean residual is **+26.39 US$**, and per quintile
+  it grows from **+4.43** (cheapest predictions, up to US$ 66.16) to **+60.82** (most
+  expensive, above US$ 174.71). A few listings far above their prediction pull the mean up —
+  the same luxury tail that keeps RMSE and R² low.
+- **The error grows with the predicted price** (the cloud opens to the right): the model is
+  less certain in absolute dollars where prices are higher.
+- The diagonal stripes are listings with **round prices** (US$ 100, 150, 200...): for a
+  fixed actual price, the residual falls linearly as the prediction rises.
 
 ## 6 · Error analysis
 
@@ -263,9 +535,9 @@ would do with more time. -->
 |---|---------|-------|
 | 1 | Dataset, task, target and main metric | NYC Airbnb 2019 · regression · `price` (modeled as `log1p(price)`) · MAE in US$ |
 | 2 | Train · validation · test (rows) | 31,285 · 7,822 · 9,777 |
-| 3 | Best baseline and its test metric | <!-- ALEX --> |
-| 4 | Chosen network: layers × units, number of parameters, regularization | <!-- ALEX --> |
-| 5 | Optimizer, learning rate, batch and the epoch it stopped at | <!-- ALEX --> |
-| 6 | The network's main metric on the test set (mean ± std, 3 seeds) | <!-- ALEX --> |
-| 7 | Success criterion met? | <!-- ALEX --> |
+| 3 | Best baseline and its test metric | Ridge (`alpha=1.0`) · test MAE **US$ 58.13** (RMSE 203.52, R² 0.137) |
+| 4 | Chosen network: layers × units, number of parameters, regularization | 3 hidden layers, 512 → 256 → 128 units (ReLU) · 211,457 parameters · dropout 0.4 + early stopping (no weight decay, no BatchNorm) |
+| 5 | Optimizer, learning rate, batch and the epoch it stopped at | `AdamW` without weight decay (= Adam) · lr 1e-3 · batch 256 · best epoch 48 to 74 (mean 64.6), stopped at 63 to 89 (mean 79.6) over the 5 seeds |
+| 6 | The network's main metric on the test set (mean ± std, 3 seeds) | MAE **US$ 55.28 ± 0.08** over 5 seeds (RMSE 202.18 ± 0.62, R² 0.148 ± 0.005) |
+| 7 | Success criterion met? | **No** — 4.90% below Ridge, the criterion asked for 5% (threshold US$ 55.22); the US$ 2.85 gap to Ridge is 34.6 times the seed standard deviation |
 | 8 | Subgroup with the largest error and its value | <!-- LUCAS --> |

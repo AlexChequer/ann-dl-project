@@ -1,0 +1,165 @@
+{
+  "split": "test",
+  "config": {
+    "hidden": [
+      512,
+      256,
+      128
+    ],
+    "dropout": 0.4,
+    "batchnorm": false,
+    "weight_decay": 0.0,
+    "optimizer": "adamw",
+    "lr": 0.001,
+    "batch_size": 256,
+    "max_epochs": 200,
+    "patience": 15,
+    "loss": "huber"
+  },
+  "label": "512-256-128 \u00b7 lr 0.001 \u00b7 dropout 0.4",
+  "parameters": 211457,
+  "seeds": [
+    42,
+    43,
+    44,
+    45,
+    46
+  ],
+  "rows": 9777,
+  "baselines": {
+    "dummy_mean": {
+      "mae": 82.11932138429285,
+      "rmse": 222.21343720916337,
+      "r2": -0.02884472573481678,
+      "rmse_log": 0.6852114324092491
+    },
+    "ridge": {
+      "mae": 58.13155794508021,
+      "rmse": 203.51789180452624,
+      "r2": 0.1369928540865376,
+      "rmse_log": 0.452828768247599
+    }
+  },
+  "network": {
+    "mean": {
+      "mae": 55.28259979723849,
+      "rmse": 202.17812257593968,
+      "r2": 0.1483114638416365,
+      "rmse_log": 0.43554206483717817,
+      "best_epoch": 64.6,
+      "stopped_epoch": 79.6
+    },
+    "std": {
+      "mae": 0.0823757503285059,
+      "rmse": 0.6213514270499924,
+      "r2": 0.00523540645049352,
+      "rmse_log": 0.001360627616857298,
+      "best_epoch": 11.013627921806693,
+      "stopped_epoch": 11.013627921806693
+    },
+    "runs": [
+      {
+        "seed": 42,
+        "mae": 55.23085097639947,
+        "rmse": 202.52594201224318,
+        "r2": 0.14538497653216065,
+        "rmse_log": 0.43714458979871357,
+        "best_epoch": 69,
+        "stopped_epoch": 84
+      },
+      {
+        "seed": 43,
+        "mae": 55.37734968415131,
+        "rmse": 201.83767502301794,
+        "r2": 0.15118377765506952,
+        "rmse_log": 0.4357221764647639,
+        "best_epoch": 73,
+        "stopped_epoch": 88
+      },
+      {
+        "seed": 44,
+        "mae": 55.35909607371005,
+        "rmse": 201.3838963098936,
+        "r2": 0.15499616551748086,
+        "rmse_log": 0.4344778585842873,
+        "best_epoch": 74,
+        "stopped_epoch": 89
+      },
+      {
+        "seed": 45,
+        "mae": 55.25817878997577,
+        "rmse": 202.1431444594203,
+        "r2": 0.1486125666942284,
+        "rmse_log": 0.43387630889786927,
+        "best_epoch": 59,
+        "stopped_epoch": 74
+      },
+      {
+        "seed": 46,
+        "mae": 55.18752346195585,
+        "rmse": 202.99995507512344,
+        "r2": 0.14137983280924304,
+        "rmse_log": 0.4364893904402569,
+        "best_epoch": 48,
+        "stopped_epoch": 63
+      }
+    ]
+  },
+  "criterion": {
+    "best_baseline": "ridge",
+    "best_baseline_mae": 58.13155794508021,
+    "threshold_mae": 55.2249800478262,
+    "gain_mean": 0.04900880431474541,
+    "gain_per_seed": {
+      "42": 0.049899006171848725,
+      "43": 0.04737888262913814,
+      "44": 0.04769288781128911,
+      "45": 0.04942890327864713,
+      "46": 0.05064434168280396
+    },
+    "seeds_meeting_criterion": 1,
+    "met": false,
+    "gap_mae": 2.8489581478417207,
+    "gap_over_seed_std": 34.5849128715717,
+    "worst_seed_mae": 55.37734968415131,
+    "all_seeds_beat_baseline": true
+  },
+  "residuals_seed_42": {
+    "mean_residual": 26.39337279147986,
+    "median_residual": -0.9967761058064184,
+    "share_underpredicted": 0.4888002454740718,
+    "mean_log_residual": 0.03239068304690228,
+    "by_predicted_quintile": [
+      {
+        "pred_from": 28.831999999999997,
+        "pred_to": 66.156,
+        "median_residual": -2.981219216607496,
+        "mean_residual": 4.4253492827111
+      },
+      {
+        "pred_from": 66.156,
+        "pred_to": 90.191,
+        "median_residual": -1.376087331148966,
+        "mean_residual": 13.13712000250027
+      },
+      {
+        "pred_from": 90.191,
+        "pred_to": 128.122,
+        "median_residual": 0.44998073953361484,
+        "mean_residual": 19.093692473237912
+      },
+      {
+        "pred_from": 128.122,
+        "pred_to": 174.705,
+        "median_residual": 3.594142003985297,
+        "mean_residual": 34.48051465202189
+      },
+      {
+        "pred_from": 174.705,
+        "pred_to": 984.941,
+        "median_residual": 1.195832758924368,
+        "mean_residual": 60.82381290927644
+      }
+    ]
+  }
+}
