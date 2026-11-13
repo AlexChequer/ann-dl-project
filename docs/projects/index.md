@@ -56,3 +56,4 @@ feature explains price well (largest |ρ| = 0.44). The CSV is versioned in `data
 | 2026-11-12 | Validation = 20% of the EDA training set (31,285 / 7,822 / 9,777 rows); preprocessor refitted on the new training set → 91 features | choices made on validation; test used once |
 | 2026-11-12 | Main metric MAE in US$; success = network MAE at least 5% below the best baseline on the test set | RMSE and R² in US$ are dominated by the price tail |
 | 2026-11-12 | MLP in PyTorch, Huber loss on `log1p(price)` | robust to the tail left after the log |
+| 2026-11-13 | Permutation importance measured on validation, shuffling the 10 original columns instead of the 91 model columns | 10 columns × 5 shuffles is a repeated probe, which does not belong on a test set read once; shuffling an original column moves every one-hot column it produces |
