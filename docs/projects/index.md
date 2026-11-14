@@ -43,7 +43,7 @@ feature explains price well (largest |ρ| = 0.44). The CSV is versioned in `data
 ## Status
 
 - [x] **1. EDA**
-- [ ] **2. Regression**
+- [x] **2. Regression**
 - [ ] **3. Generative**
 
 ## Decision log

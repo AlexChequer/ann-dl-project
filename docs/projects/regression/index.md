@@ -521,13 +521,17 @@ residual per quintile.
 
 ## 6 · Error analysis
 
-The analysis runs on the **validation** set with the base network of Stage 3 (MAE
-US$ 55.57, against US$ 57.85 for Ridge). The permutation importance below shuffles ten
-columns five times each: that is a repeated probe, not a single evaluation, so it belongs
-on validation — the test set is read once, in Stage 5.
+This section reads the **test** predictions Stage 5 wrote
+([`code/test_predictions.csv`](https://github.com/AlexChequer/ann-dl-project/blob/main/docs/projects/regression/code/test_predictions.csv),
+seed 42): MAE **US$ 55.23** against Ridge's **US$ 58.13** on the same 9,777 rows. No new
+prediction is made on the test set here.
 
-Every subgroup is also measured against **Ridge** on the same rows. "The network errs more
-here" only means something next to what the linear baseline does with the same listings.
+The permutation importance is the one exception: shuffling ten columns five times each is a
+repeated probe, not a single evaluation, so it runs on the **validation** set, with the
+chosen configuration retrained at seed 42 (validation MAE US$ 55.20).
+
+Every subgroup is also measured against **Ridge** on the same rows — "the network errs more
+here" only means something next to what the best baseline does with the same listings.
 **Bias** is the mean of (prediction − true price): negative means the network asks for less
 than the listing charges.
 
@@ -541,223 +545,246 @@ than the listing charges.
 
 | `room_type` | Rows | MAE (US$) | Ridge (US$) | Gain | Mean price | MAE / price | Bias (US$) |
 |-------------|-----:|----------:|------------:|-----:|-----------:|------------:|-----------:|
-| Entire home/apt | 4,086 | 76.63 | 79.30 | 3.4% | 205.54 | 37.3% | −32.19 |
-| Private room | 3,551 | 32.43 | 34.27 | 5.4% | 90.63 | 35.8% | −15.65 |
-| **Shared room** | **185** | 34.51 | 36.55 | 5.6% | 73.55 | **46.9%** | −20.81 |
+| Entire home/apt | 5,085 | 80.49 | 83.87 | 4.0% | 210.30 | 38.3% | −41.63 |
+| Private room | 4,451 | 27.32 | 29.67 | 7.9% | 86.47 | 31.6% | −9.55 |
+| **Shared room** | **241** | 37.87 | 40.81 | 7.2% | 74.45 | **50.9%** | −15.95 |
 
 | `neighbourhood_group` | Rows | MAE (US$) | Ridge (US$) | Gain | Mean price | MAE / price | Bias (US$) |
 |-----------------------|-----:|----------:|------------:|-----:|-----------:|------------:|-----------:|
-| Manhattan | 3,479 | 75.74 | 79.12 | 4.3% | 195.04 | 38.8% | −33.33 |
-| Brooklyn | 3,207 | 41.52 | 43.05 | 3.5% | 120.38 | 34.5% | −17.27 |
-| Queens | 884 | 34.14 | 35.78 | 4.6% | 100.52 | 34.0% | −19.21 |
-| **Bronx** | **196** | 28.24 | 27.35 | **−3.2%** | 81.15 | 34.8% | −7.48 |
-| **Staten Island** | **56** | 40.72 | 38.92 | **−4.6%** | 105.20 | 38.7% | −20.47 |
+| **Staten Island** | **73** | **108.08** | 111.26 | 2.9% | 164.64 | **65.6%** | −85.85 |
+| Manhattan | 4,344 | 72.60 | 77.62 | 6.5% | 194.01 | 37.4% | −37.08 |
+| Bronx | 190 | 41.67 | 42.01 | **0.8%** | 94.97 | 43.9% | −22.87 |
+| Brooklyn | 4,023 | 41.11 | 42.42 | 3.1% | 119.77 | 34.3% | −16.88 |
+| Queens | 1,147 | 37.85 | 38.73 | 2.3% | 102.46 | 36.9% | −16.09 |
 
 | `availability_365` | Rows | MAE (US$) | Ridge (US$) | Gain | Mean price | MAE / price | Bias (US$) |
 |--------------------|-----:|----------:|------------:|-----:|-----------:|------------:|-----------:|
-| `== 0` | 2,787 | 43.20 | 45.36 | 4.8% | 128.96 | 33.5% | −16.42 |
-| `> 0` | 5,035 | 62.41 | 64.76 | 3.6% | 162.04 | 38.5% | −28.83 |
+| `== 0` | 3,486 | 50.81 | 52.84 | 3.8% | 138.20 | 36.8% | −24.25 |
+| `> 0` | 6,291 | 57.68 | 61.06 | 5.5% | 157.44 | 36.6% | −27.58 |
 
 ![MAE by subgroup](figures/fig06-mae-by-subgroup.png)
 /// caption
-**Figure 6** — MAE in US$ by room type and by borough, validation set. Bars are the
-network, red diamonds are Ridge on the same rows, and the dashed line is the MAE over all
-7,822 rows (US$ 55.57).
+**Figure 6** — MAE in US$ by room type and by borough, test set. Bars are the network
+(seed 42), red diamonds are Ridge on the same rows, and the dashed line is the MAE over all
+9,777 test rows (US$ 55.23).
 ///
 
 **Reading Figure 6.**
 
-- **MAE in US$ tracks the price level, not rarity.** Entire home/apt has the largest MAE
-  (76.63) only because it is the most expensive group (mean US$ 205.54); its *relative*
-  error, 37.3%, is close to Private room's 35.8%. Reading the subgroups in US$ alone would
-  put the blame on the biggest, best-represented group — which is why the table carries
-  MAE / mean price.
-- **Where rarity does show up is the relative error of Shared room: 46.9%**, 11 points
-  above Private room (35.8%) at a comparable price level (US$ 73.55 against US$ 90.63).
-  *Hypothesis:* with 2.34% of the training rows (EDA, Stage 2B) the network has little
-  evidence for this level and falls back on something close to the room-type average. The
-  price band of comparable listings (US$ 60–90) errs by 27.8%, so the 46.9% is not simply
-  "cheap listings are harder".
-- **The two rarest boroughs are the only groups where the network loses to Ridge:** Bronx
-  −3.2% and Staten Island −4.6%, against gains of 3.4% to 5.6% everywhere else.
-  *Hypothesis:* the network's gain comes from bending the price surface locally, which
-  needs enough listings per region; in the two boroughs the EDA flagged as rare (2.30% and
-  0.77% of the dataset) there is not enough local evidence, and the extra flexibility costs
-  more than it earns. With 56 rows, Staten Island alone is US$ 1.80 of difference and is
-  not reliable; the Bronx, with 196 rows, points the same way.
+- **MAE in US$ tracks the price level, not the difficulty.** Entire home/apt has the largest
+  MAE among room types (80.49) mostly because it is the most expensive group (mean
+  US$ 210.30); in relative terms, 38.3%, it is closer to the rest. Reading subgroups in
+  dollars alone blames the biggest, best-represented group, which is why every table here
+  carries MAE / mean price.
+- **Staten Island is the worst subgroup on both readings: MAE US$ 108.08 and 65.6% of its
+  mean price**, with a bias of −85.85 — the largest of any group. *But the number is
+  carried by a single listing:* row 22353, an Entire home/apt at US$ 5,000 predicted at
+  US$ 153.9, contributes **US$ 66.4 of the US$ 108.08 — 61% of the group's MAE**. Without
+  it Staten Island errs by US$ 42.28, in line with the Bronx. With 73 test rows, one tail
+  listing moves the whole group.
+- *Hypothesis for the pattern, not for the outlier:* the two boroughs the EDA flagged as
+  rare (Staten Island 0.77%, Bronx 2.30%) are the two with the **highest relative error**
+  (65.6% and 43.9%) and the **smallest gain over Ridge** (2.9% and 0.8%, against 6.5% in
+  Manhattan). Where there are few listings, the network has little local evidence and ends
+  up close to the linear solution — it does not get the chance to earn its extra capacity.
+- **Shared room repeats the pattern inside `room_type`: 50.9% relative error**, 19 points
+  above Private room (31.6%) at a comparable price level (US$ 74.45 against US$ 86.47). It
+  is 2.46% of the test rows, and the EDA measured 2.34% of the dataset. Its MAE drops from
+  37.87 to 30.75 without its single worst listing, so part of this is the same tail effect,
+  but the gap to Private room survives it.
 - **`availability_365 == 0` is not a harder subgroup.** The EDA flagged these 35.9% of
-  listings as suspicious; they are 35.63% of validation, and they err *less*, both in US$
-  (43.20 against 62.41) and relatively (33.5% against 38.5%). *Hypothesis:* the flag marks
-  cheaper listings (mean US$ 128.96 against US$ 162.04) rather than harder ones. The column
-  still carries signal — it is fourth in the permutation ranking below.
+  listings as suspicious; they are 35.66% of the test set and they err *less* in dollars
+  (50.81 against 57.68) and the same in relative terms (36.8% against 36.6%). *Hypothesis:*
+  the flag marks cheaper listings (mean US$ 138.20 against US$ 157.44), not harder ones.
 
 ### B. Error by band of the true price
 
 | Band of the true price | Rows | MAE (US$) | Ridge (US$) | Gain | Mean price | MAE / price | Bias (US$) |
 |------------------------|-----:|----------:|------------:|-----:|-----------:|------------:|-----------:|
-| US$ 10–60 | 1,608 | 16.11 | 19.87 | **18.9%** | 47.15 | 34.2% | **+14.30** |
-| US$ 60–90 | 1,574 | 21.29 | 23.07 | 7.7% | 76.56 | 27.8% | +7.40 |
-| US$ 90–130 | 1,569 | 32.34 | 35.88 | 9.9% | 110.06 | 29.4% | +11.99 |
-| US$ 130–200 | 1,730 | 41.38 | 41.77 | 0.9% | 167.81 | 24.7% | −6.35 |
-| US$ 200–9,999 | 1,341 | 188.59 | 190.65 | 1.1% | 384.76 | 49.0% | −174.06 |
-| *tail: > US$ 500* | *166* | **768.74** | 793.06 | 3.1% | 1,003.86 | **76.6%** | **−768.74** |
+| US$ 10–60 | 2,010 | 17.69 | 19.55 | 9.5% | 47.36 | 37.3% | **+16.68** |
+| US$ 60–90 | 1,967 | 19.26 | 23.48 | **18.0%** | 76.42 | 25.2% | +9.48 |
+| US$ 90–130 | 1,961 | 28.50 | 35.12 | **18.9%** | 110.03 | 25.9% | +7.70 |
+| US$ 130–199 | 1,890 | 38.05 | 41.57 | 8.5% | 162.22 | 23.5% | −4.59 |
+| US$ 199–10,000 | 1,949 | 173.81 | 172.10 | **−1.0%** | 361.37 | 48.1% | −162.48 |
+| *tail: > US$ 500* | *194* | **857.99** | 882.23 | 2.7% | 1,103.50 | **77.8%** | −857.69 |
 
 The last row is the luxury tail, already contained in the top band; it is listed apart
 because the EDA singled it out.
 
 ![MAE by price band](figures/fig07-mae-by-price-band.png)
 /// caption
-**Figure 7** — MAE in US$ by band of the true price, validation set (bars: network;
+**Figure 7** — MAE in US$ by band of the true price, test set (bars: network, seed 42;
 diamonds: Ridge; green line, right axis: MAE as a percentage of the band's mean price).
 Bands are the quintiles of the true price; the last column is the tail above US$ 500.
 ///
 
 **Reading Figure 7.**
 
-- **The network under-predicts, and the bias grows with the price.** The bias goes from
-  **+14.30** in the cheapest band to **−174.06** in the top one. In the tail it is
-  **−768.74 — exactly minus the MAE**, which can only happen if *every one of the 166
-  listings above US$ 500 is predicted below its price*.
-- *Hypothesis:* the target is `log1p(price)` under a Huber loss, so a listing priced at
-  US$ 1,000 predicted at US$ 300 costs about the same as one at US$ 100 predicted at
-  US$ 30. With features that do not explain the tail (EDA: largest |ρ| is 0.44), the
-  cheapest thing the optimizer can do is sit near the conditional median of the log, which
-  in US$ is far below the tail. This is the same argument that made MAE the main metric in
-  Stage 0, now visible per band.
-- **The network's gain over Ridge lives in the cheap bands and vanishes at the top:**
-  18.9% in US$ 10–60 and 9.9% in US$ 90–130, against 0.9% and 1.1% in the two most
-  expensive bands. The nonlinearity the network adds is worth real percentage points where
-  the prices are small, and almost nothing where the dollars are.
-- The U shape of the relative error (34.2% → 24.7% → 49.0% → 76.6%) says the model is at
-  its best in the US$ 130–200 band, which is where the bias crosses zero.
+- **The network under-predicts, and the bias grows with the price:** from **+16.68** in the
+  cheapest band to **−162.48** in the top one. In the tail, **193 of the 194 listings above
+  US$ 500 are predicted below their price** — a single one is over-predicted.
+- *Hypothesis:* the target is `log1p(price)` under a Huber loss, so a listing at US$ 1,000
+  predicted at US$ 300 costs roughly what one at US$ 100 predicted at US$ 30 costs. With
+  features that do not explain the tail (EDA: largest |ρ| is 0.44), the cheapest thing the
+  optimizer can do is sit near the conditional median of the log, which in dollars is far
+  below the tail. This is the argument that made MAE the main metric in Stage 0, now
+  visible band by band.
+- **The network's gain over Ridge is concentrated in the middle and turns negative at the
+  top:** 18.0% in US$ 60–90 and 18.9% in US$ 90–130, 9.5% at the bottom, 8.5% in
+  US$ 130–199, and **−1.0% in the most expensive fifth**, where Ridge is the better model.
+  The nonlinearity the network adds pays off on ordinary listings and is worth nothing — or
+  slightly less than nothing — exactly where a dollar of error costs the most.
+- The relative error traces a U (37.3% → 23.5% → 48.1% → 77.8%): the model is at its best
+  in US$ 130–199, which is also where its bias crosses zero.
 
 ### C. The ten worst predictions
 
 | Row | True (US$) | Predicted (US$) | Error | Room type | Borough · neighbourhood | Min. nights | Reviews | Availability |
 |----:|-----------:|----------------:|------:|-----------|-------------------------|------------:|--------:|-------------:|
-| 12342 | 9,999 | 82.8 | 9,916.2 | Private room | Manhattan · Lower East Side | 99 | 6 | 83 |
-| 44034 | 6,800 | 537.6 | 6,262.4 | Entire home/apt | Manhattan · Chelsea | 1 | **0** | 364 |
-| 2698 | 5,000 | 371.1 | 4,628.9 | Entire home/apt | Manhattan · Nolita | 1 | 2 | 365 |
-| 29663 | 3,518 | 326.2 | 3,191.8 | Entire home/apt | Manhattan · East Village | 1 | **0** | 215 |
-| 28727 | 3,000 | 75.6 | 2,924.4 | Private room | Brooklyn · Brighton Beach | 1 | **0** | 90 |
-| 38498 | 2,999 | 189.9 | 2,809.1 | Entire home/apt | Manhattan · Upper West Side | 1 | **0** | 0 |
-| 46533 | 2,995 | 206.6 | 2,788.4 | Entire home/apt | Manhattan · Chelsea | 30 | 1 | 214 |
-| 22992 | 2,900 | 313.8 | 2,586.2 | Entire home/apt | Manhattan · Upper West Side | 1 | **0** | 180 |
-| 29665 | 2,626 | 227.3 | 2,398.7 | Entire home/apt | Brooklyn · Park Slope | 1 | **0** | 31 |
-| 45710 | 2,500 | 192.2 | 2,307.8 | Entire home/apt | Manhattan · Hell's Kitchen | 70 | **0** | 191 |
+| 17692 | 10,000 | 142.5 | 9,857.5 | Entire home/apt | Brooklyn · Greenpoint | 5 | 5 | 0 |
+| 48043 | 6,500 | 459.2 | 6,040.8 | Entire home/apt | Manhattan · Tribeca | 180 | **0** | 365 |
+| 3720 | 5,250 | 195.4 | 5,054.6 | Entire home/apt | Manhattan · Little Italy | 1 | **0** | 0 |
+| 22353 | 5,000 | 153.9 | 4,846.1 | Entire home/apt | Staten Island · Randall Manor | 1 | **0** | 344 |
+| 28947 | 4,160 | 294.5 | 3,865.5 | Entire home/apt | Manhattan · Chelsea | 1 | **0** | 364 |
+| 17665 | 3,800 | 186.3 | 3,613.7 | Entire home/apt | Manhattan · Greenwich Village | 30 | 2 | 180 |
+| 3788 | 3,750 | 219.1 | 3,530.9 | Entire home/apt | Manhattan · East Village | 1 | **0** | 0 |
+| 28858 | 3,000 | 608.4 | 2,391.6 | Entire home/apt | Manhattan · SoHo | 7 | 1 | 325 |
+| 5839 | 2,695 | 187.1 | 2,507.9 | Entire home/apt | Manhattan · Upper West Side | 1 | **0** | 0 |
+| 24477 | 2,500 | 73.9 | 2,426.1 | Private room | Bronx · Riverdale | 2 | **0** | 179 |
 
 Row numbers are lines of `data/AB_NYC_2019.csv`, counting from 0.
 
 **Reading.** All ten are under-predictions, all cost at least US$ 2,500, and the network
-never goes above US$ 537.6 on any of them. Two patterns, each with a number behind it:
+never goes above US$ 608.4 on any of them. Two patterns, each with a number behind it:
 
 - **Seven of the ten have zero reviews**, against 20.56% of the dataset (EDA, Stage 1B:
   `last_review` is missing exactly when `number_of_reviews == 0`). *Hypothesis:* these are
   not listings the market priced — they are placeholders or blocked calendars, where the
   host types a deterrent price. The dataset has no "was it ever booked" column, so nothing
-  in the features can separate them from a real luxury listing, and no model trained on
-  these ten features will predict them.
-- **The extreme case is row 12342: a Private room in Lower East Side at US$ 9,999 with a
-  99-night minimum.** A private room at ten thousand dollars a night with a three-month
-  minimum stay is not a product; the network predicts US$ 82.8, which is the right answer
-  for the features it can see.
-- Eight of the ten are in Manhattan and eight are Entire home/apt — the two levels with the
-  highest mean price, which is where a tail can exist at all.
+  in the features separates them from a genuine luxury listing, and no model trained on
+  these ten columns will predict them.
+- **The extreme case is row 17692: an Entire home/apt in Greenpoint at US$ 10,000 with
+  `availability_365 == 0`** — a listing open zero days in the next year, priced at ten
+  thousand dollars a night. The network predicts US$ 142.5, which is the right answer for a
+  Greenpoint apartment and the wrong answer for whatever this row is.
+- Nine of the ten are Entire home/apt and seven are in Manhattan, the levels with the
+  highest mean price — the only place a tail of this size can exist. Two of them, rows
+  22353 and 24477, are the single listings that carry the Staten Island and Bronx MAEs in
+  Section 6A.
 
 ### D. Permutation importance
 
 ![Permutation importance](figures/fig08-permutation-importance.png)
 /// caption
 **Figure 8** — Increase in validation MAE when one original column is shuffled, mean of 5
-shuffles (error bars: ± 1 standard deviation). The 10 original columns are shuffled, not
-the 91 model columns, so one shuffle moves every one-hot column the feature produces.
+shuffles (error bars: ± 1 standard deviation), chosen configuration retrained at seed 42.
+The 10 original columns are shuffled, not the 91 model columns, so one shuffle moves every
+one-hot column the feature produces.
 ///
 
 | Original column | Δ MAE (US$) | ± std | EDA, Spearman with price |
 |-----------------|------------:|------:|-------------------------:|
-| `room_type` | **25.43** | 0.38 | categorical |
-| `longitude` | 9.57 | 0.31 | −0.439 |
-| `minimum_nights` | 7.56 | 0.17 | 0.102 |
-| `availability_365` | 7.02 | 0.27 | 0.086 |
-| `neighbourhood` | 5.98 | 0.32 | categorical |
-| `latitude` | 4.83 | 0.18 | 0.132 |
-| `calculated_host_listings_count` | 3.59 | 0.25 | −0.108 |
-| `number_of_reviews` | 2.90 | 0.17 | −0.057 |
-| `neighbourhood_group` | 2.40 | 0.12 | categorical |
-| `reviews_per_month` | 1.32 | 0.10 | −0.021 |
+| `room_type` | **24.49** | 0.31 | categorical |
+| `minimum_nights` | 5.51 | 0.22 | 0.102 |
+| `availability_365` | 5.21 | 0.23 | 0.086 |
+| `longitude` | 4.64 | 0.27 | −0.439 |
+| `neighbourhood` | 3.61 | 0.18 | categorical |
+| `calculated_host_listings_count` | 2.83 | 0.22 | −0.108 |
+| `neighbourhood_group` | 2.79 | 0.11 | categorical |
+| `latitude` | 2.59 | 0.12 | 0.132 |
+| `number_of_reviews` | 2.14 | 0.13 | −0.057 |
+| `reviews_per_month` | 1.21 | 0.09 | −0.021 |
 
-**Does it confirm the EDA? Yes, with one caveat about how the question is asked.**
+**Does it confirm the EDA? Partly — one prediction holds, the other does not survive the
+way the question is asked.**
 
-- **`room_type` dominates: +25.43, 2.7 times the next column.** The EDA concluded that
-  `room_type` is "the categorical feature that separates price the most" (Stage 3B). The
-  network agrees, and by a wide margin.
-- **Location is confirmed as well, but it is split over four columns.** The EDA called
-  location "the most important numerical information for the price" (Stage 3A, Figure 5).
-  Here `longitude` leads the numerical columns at +9.57, as its |ρ| = 0.44 predicted — but
-  `longitude`, `neighbourhood`, `latitude` and `neighbourhood_group` together sum to
-  **+22.78**, close to `room_type` on its own. *Caveat:* permuting one column at a time
-  splits the credit among correlated columns, so it understates any feature that the
-  pipeline spreads out. `neighbourhood_group` is the clearest case: shuffling it costs only
-  +2.40 because the 76 `neighbourhood` columns still carry the borough.
-- **Reviews are last, as the EDA predicted, but not at zero.** `number_of_reviews` (+2.90)
-  and `reviews_per_month` (+1.32) are the smallest numerical contributions, matching
-  |ρ| ≤ 0.06 in the EDA. That they are not zero is consistent with Section C: zero reviews
-  is a weak marker of a listing that was never transacted, and the network does use it.
-- `minimum_nights` at +7.56 is the one ranking the EDA did not anticipate: its |ρ| is only
-  0.102, the third smallest. A monotonic correlation does not see a feature that matters
-  only through a nonlinear rule — a one-night minimum and a 99-night minimum describe
-  different products at the same price point.
+- **`room_type` dominates: +24.49, 4.4 times the next column**, and 1.8 times the four
+  location columns added together (+13.62). The EDA concluded that `room_type` is "the
+  categorical feature that separates price the most" (Stage 3B). The network agrees, and by
+  more than the EDA suggested.
+- **Location does *not* come out as the most important information, which is what the EDA
+  predicted** (Stage 3A, Figure 5: "location is the most important numerical information
+  for the price", with `longitude` at |ρ| = 0.44). Here `longitude` is fourth at +4.64,
+  behind `minimum_nights` and `availability_365`, and `latitude` is eighth. *Why the
+  disagreement:* the pipeline spreads location over four correlated columns, and permuting
+  one at a time lets the other three cover for it — shuffling `neighbourhood_group` costs
+  only +2.79 because the 76 `neighbourhood` columns still carry the borough. Dropout 0.4
+  makes this worse by design: it trains the network to survive missing inputs, so no single
+  column is indispensable. The EDA's claim is about how much location *explains*; this
+  table measures how much the network *depends* on each column alone. They are different
+  questions, and only the second one is answered here.
+- **Reviews are last, as the EDA predicted:** `number_of_reviews` (+2.14) and
+  `reviews_per_month` (+1.21) are the two smallest contributions, matching |ρ| ≤ 0.06. That
+  they are not zero fits Section C — zero reviews is a weak marker of a listing that was
+  never transacted, and the network does use it.
+- **`minimum_nights` is the one ranking neither the EDA nor we expected: second, at +5.51**,
+  on a |ρ| of just 0.102. A monotonic correlation cannot see a column that matters through
+  a nonlinear rule: a one-night minimum and a 180-night minimum describe different products
+  at the same price point, and the network has the capacity to use that while Ridge does
+  not.
 
 ## 7 · Conclusion
 
-**Was the network worth it?** On validation, against the best baseline: MAE US$ 55.57
-against Ridge's US$ 57.85, **3.9% lower**. The cost of that 3.9% is 20,097 parameters
-against 92, a PyTorch dependency, and a training loop with early stopping instead of a
-closed-form fit. Section 6B says where the 3.9% comes from: **18.9% in the US$ 10–60 band
-and 9.9% in US$ 90–130, against 0.9% and 1.1% in the two most expensive bands.** The
-network buys accuracy where the prices are small in absolute terms, which is worth little
-in dollars; on the listings where an error costs the most, it matches the linear model. And
-on the two rarest boroughs it is *worse* than Ridge. The honest summary for this network is
-that it is a marginal improvement that has not met the 5% criterion set in Stage 0.
+**Was the network worth it?** Stage 5 answers in one line: test MAE **US$ 55.28 ± 0.08**
+over 5 seeds against Ridge's **US$ 58.13**, a gain of **4.90%** where the Stage 0 criterion
+asked for 5%. The criterion was set before any network was trained and it was missed by
+US$ 0.06 of MAE. The gap to Ridge is nevertheless 34.6 times the standard deviation across
+seeds, so the improvement is real — it is simply smaller than what the team had decided
+would make the network worth adopting.
+
+Section 6B says where those 4.9% come from, and the answer sharpens the verdict: **18.0%
+and 18.9% in the US$ 60–130 bands, 9.5% at the bottom, and −1.0% in the most expensive
+fifth**, where Ridge wins. The network buys accuracy on ordinary listings, in percentage
+terms, and gives a little back exactly where an error costs the most dollars. Against that:
+**211,457 parameters instead of 92**, a PyTorch dependency, a training loop with early
+stopping, and a hyperparameter search over 19 configurations. For a team that wants a price
+hint for a typical listing, the network earns its place; for anyone who cares about the
+expensive end of the market, Ridge is the same model with none of the cost.
 
 **Limitations.**
 
 - **The data is from 2019.** It is a pre-pandemic snapshot of a market that has since
-  changed in level and in regulation; nothing here transfers to today's prices without
-  being refitted.
-- **The listing text was dropped.** `name` is the one column that carries words like
-  "luxury", "penthouse" or "loft", which is exactly the information missing to explain the
-  tail that Section 6B and 6C showed the network cannot reach.
+  changed in price level and in regulation; nothing here transfers to today without being
+  refitted.
+- **The listing text was dropped.** `name` is the one column carrying words like "luxury",
+  "penthouse" or "loft" — exactly the information missing to explain the tail that Sections
+  6B and 6C show the network cannot reach.
 - **There is no outcome column.** Nothing says whether a listing was ever booked, so a
-  placeholder at US$ 9,999 and a real luxury listing are identical to the model. Seven of
-  the ten worst errors are of this kind.
-- **Prices are point predictions with no interval.** A model with 34% to 77% relative error
-  depending on the band reports a single number, which hides how uncertain it is.
+  blocked calendar at US$ 10,000 and a real luxury apartment are identical to the model.
+  Seven of the ten worst errors are of that kind.
+- **Small subgroups are not measurable with this error distribution.** Staten Island's MAE
+  is 61% one listing; the Bronx's is 31% one listing. Any claim about a group of 73 rows,
+  including the one in row 8 of the summary, is a claim about its worst listing.
+- **The output is a point prediction with no interval**, while the relative error ranges
+  from 23.5% to 77.8% depending on the band.
 
 **Who is affected by an error.** The bias is not symmetric, so the harm is not either:
 
-- **A host with an expensive listing is told to undercharge.** In the US$ 200–9,999 band
-  the bias is −174.06 on a mean price of 384.76; a host who prices from this model gives up
-  real revenue on every night booked.
-- **A host with a cheap listing is told to overcharge**, by +14.30 on a mean price of 47.15
-  in the bottom band — a 30% markup that can leave the calendar empty.
-- **The smallest hosts are served worst.** The model is least reliable exactly where there
-  are fewest listings: 46.9% relative error on Shared room, and worse than a linear model
-  in the Bronx and on Staten Island. Any tool built on this would work better for the
-  Manhattan segment than for the hosts with the least room to absorb a bad night.
-- **A guest** reading a prediction as a fair price would judge most expensive listings
-  overpriced, because the model is systematically below them.
+- **A host with an expensive listing is told to undercharge.** In the US$ 199–10,000 band
+  the bias is −162.48 on a mean price of 361.37; a host who prices from this model gives up
+  real revenue every booked night.
+- **A host with a cheap listing is told to overcharge**, by +16.68 on a mean price of 47.36
+  — a 35% markup that can leave the calendar empty.
+- **The smallest hosts are served worst.** The model is least reliable where there are
+  fewest listings: 65.6% relative error on Staten Island, 50.9% on Shared room, and the
+  smallest gains over Ridge in the Bronx (0.8%) and Staten Island (2.9%). A tool built on
+  this would work better for Manhattan apartments than for the hosts with the least room to
+  absorb a bad night.
+- **A guest** reading a prediction as a fair price would judge nearly every expensive
+  listing overpriced, since 193 of the 194 listings above US$ 500 are predicted below their
+  price.
 
 **What we would do with more time.**
 
-1. **Text features from `name`** (TF-IDF or sentence embeddings), the cheapest likely gain
+1. **Text features from `name`** (TF-IDF or sentence embeddings) — the cheapest likely gain,
    given that the tail is the main source of error.
 2. **An "is it active" proxy** from reviews and availability, to flag or drop the
    placeholder listings that dominate the worst cases instead of training against them.
-3. **Quantile regression** (or a two-stage model: classify "tail", then regress), to report
-   an interval and to stop optimizing a single point for a distribution this skewed.
+3. **Quantile regression**, or a two-stage model that first classifies "tail", to report an
+   interval instead of optimizing a single point for a distribution this skewed.
 4. **Target encoding for `neighbourhood`** instead of 76 one-hot columns, which would also
-   make the permutation importance of location readable in one number.
+   make the importance of location readable in a single number rather than split across
+   four columns.
 
 ## Results summary
 
@@ -770,4 +797,4 @@ that it is a marginal improvement that has not met the 5% criterion set in Stage
 | 5 | Optimizer, learning rate, batch and the epoch it stopped at | `AdamW` without weight decay (= Adam) · lr 1e-3 · batch 256 · best epoch 48 to 74 (mean 64.6), stopped at 63 to 89 (mean 79.6) over the 5 seeds |
 | 6 | The network's main metric on the test set (mean ± std, 3 seeds) | MAE **US$ 55.28 ± 0.08** over 5 seeds (RMSE 202.18 ± 0.62, R² 0.148 ± 0.005) |
 | 7 | Success criterion met? | **No** — 4.90% below Ridge, the criterion asked for 5% (threshold US$ 55.22); the US$ 2.85 gap to Ridge is 34.6 times the seed standard deviation |
-| 8 | Subgroup with the largest error and its value | <!-- LUCAS, refeito após a etapa 5 --> |
+| 8 | Subgroup with the largest error and its value | **Staten Island (n = 73): MAE US$ 108.08**, 65.6% of its mean price — but 61% of it is one listing (row 22353); without it, US$ 42.28. By price band: the tail above US$ 500 (n = 194), MAE US$ 857.99. Test set, Section 6 |

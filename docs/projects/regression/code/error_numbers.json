@@ -1,12 +1,13 @@
 {
-  "mode": "provisional",
-  "split": "validation",
+  "mode": "final",
+  "split": "test",
   "config": {
     "hidden": [
-      128,
-      64
+      512,
+      256,
+      128
     ],
-    "dropout": 0.0,
+    "dropout": 0.4,
     "batchnorm": false,
     "weight_decay": 0.0,
     "optimizer": "adamw",
@@ -17,243 +18,291 @@
     "loss": "huber"
   },
   "seed": 42,
-  "model_val_mae": 55.567693719368926,
-  "best_epoch": 18,
-  "rows": 7822,
+  "model_val_mae": 55.203443045725244,
+  "best_epoch": 51,
+  "rows": 9777,
   "overall": {
-    "mae": 55.567693719368926,
-    "rmse": 198.30285592161715,
-    "r2": 0.14947659422266624,
-    "rmse_log": 0.44006313736702113
+    "mae": 55.23085097639947,
+    "rmse": 202.52594201224318,
+    "r2": 0.14538497653216065,
+    "rmse_log": 0.43714458979871357
   },
   "overall_ridge": {
-    "mae": 57.84757421427304,
-    "rmse": 200.9578291573394,
-    "r2": 0.12654971058164077,
-    "rmse_log": 0.45848932695798034
+    "mae": 58.13155794508021,
+    "rmse": 203.51789180452624,
+    "r2": 0.1369928540865376,
+    "rmse_log": 0.452828768247599
   },
   "subgroups": {
     "room_type": [
       {
         "group": "Entire home/apt",
-        "n": 4086,
-        "share_pct": 52.24,
-        "mae": 76.6274696460838,
-        "bias": -32.19116616105486,
-        "mean_price": 205.5425844346549,
-        "mae_pct_of_price": 37.3,
-        "mae_ridge": 79.30251869353498,
-        "gain_vs_ridge_pct": 3.4
+        "n": 5085,
+        "share_pct": 52.01,
+        "mae": 80.48696168937315,
+        "bias": -41.630280626241294,
+        "mean_price": 210.29734513274337,
+        "mae_pct_of_price": 38.3,
+        "mae_ridge": 83.86860376287324,
+        "gain_vs_ridge_pct": 4.0
       },
       {
         "group": "Shared room",
-        "n": 185,
-        "share_pct": 2.37,
-        "mae": 34.51026586208441,
-        "bias": -20.807117621962036,
-        "mean_price": 73.54594594594595,
-        "mae_pct_of_price": 46.9,
-        "mae_ridge": 36.5504282161014,
-        "gain_vs_ridge_pct": 5.6
+        "n": 241,
+        "share_pct": 2.46,
+        "mae": 37.87097570080973,
+        "bias": -15.946283396808663,
+        "mean_price": 74.44813278008299,
+        "mae_pct_of_price": 50.9,
+        "mae_ridge": 40.80586399307887,
+        "gain_vs_ridge_pct": 7.2
       },
       {
         "group": "Private room",
-        "n": 3551,
-        "share_pct": 45.4,
-        "mae": 32.43206423951556,
-        "bias": -15.649268808701205,
-        "mean_price": 90.62573922838637,
-        "mae_pct_of_price": 35.8,
-        "mae_ridge": 34.26972821804589,
-        "gain_vs_ridge_pct": 5.4
+        "n": 4451,
+        "share_pct": 45.53,
+        "mae": 27.317215156571564,
+        "bias": -9.55178038625718,
+        "mean_price": 86.47337676926533,
+        "mae_pct_of_price": 31.6,
+        "mae_ridge": 29.66663191923316,
+        "gain_vs_ridge_pct": 7.9
       }
     ],
     "neighbourhood_group": [
       {
-        "group": "Manhattan",
-        "n": 3479,
-        "share_pct": 44.48,
-        "mae": 75.73991625405742,
-        "bias": -33.33359303953519,
-        "mean_price": 195.03679218166138,
-        "mae_pct_of_price": 38.8,
-        "mae_ridge": 79.11988867361862,
-        "gain_vs_ridge_pct": 4.3
-      },
-      {
-        "group": "Brooklyn",
-        "n": 3207,
-        "share_pct": 41.0,
-        "mae": 41.519425875906165,
-        "bias": -17.27172373202233,
-        "mean_price": 120.38478328656065,
-        "mae_pct_of_price": 34.5,
-        "mae_ridge": 43.047527019204345,
-        "gain_vs_ridge_pct": 3.5
-      },
-      {
         "group": "Staten Island",
-        "n": 56,
-        "share_pct": 0.72,
-        "mae": 40.72013102028934,
-        "bias": -20.471744206881556,
-        "mean_price": 105.19642857142857,
-        "mae_pct_of_price": 38.7,
-        "mae_ridge": 38.91581584981959,
-        "gain_vs_ridge_pct": -4.6
+        "n": 73,
+        "share_pct": 0.75,
+        "mae": 108.08195255926768,
+        "bias": -85.8451657231123,
+        "mean_price": 164.64383561643837,
+        "mae_pct_of_price": 65.6,
+        "mae_ridge": 111.25740698455984,
+        "gain_vs_ridge_pct": 2.9
       },
       {
-        "group": "Queens",
-        "n": 884,
-        "share_pct": 11.3,
-        "mae": 34.14361539734357,
-        "bias": -19.209968235415793,
-        "mean_price": 100.52149321266968,
-        "mae_pct_of_price": 34.0,
-        "mae_ridge": 35.78226276046148,
-        "gain_vs_ridge_pct": 4.6
+        "group": "Manhattan",
+        "n": 4344,
+        "share_pct": 44.43,
+        "mae": 72.59931377951693,
+        "bias": -37.082206599161616,
+        "mean_price": 194.0133517495396,
+        "mae_pct_of_price": 37.4,
+        "mae_ridge": 77.61983743101659,
+        "gain_vs_ridge_pct": 6.5
       },
       {
         "group": "Bronx",
-        "n": 196,
-        "share_pct": 2.51,
-        "mae": 28.241068839892403,
-        "bias": -7.4844767602023365,
-        "mean_price": 81.15306122448979,
-        "mae_pct_of_price": 34.8,
-        "mae_ridge": 27.35412086784874,
-        "gain_vs_ridge_pct": -3.2
+        "n": 190,
+        "share_pct": 1.94,
+        "mae": 41.674062951003236,
+        "bias": -22.8736423818174,
+        "mean_price": 94.97368421052632,
+        "mae_pct_of_price": 43.9,
+        "mae_ridge": 42.007904200326664,
+        "gain_vs_ridge_pct": 0.8
+      },
+      {
+        "group": "Brooklyn",
+        "n": 4023,
+        "share_pct": 41.15,
+        "mae": 41.11328546299051,
+        "bias": -16.876031261891352,
+        "mean_price": 119.76634352473279,
+        "mae_pct_of_price": 34.3,
+        "mae_ridge": 42.418038822351214,
+        "gain_vs_ridge_pct": 3.1
+      },
+      {
+        "group": "Queens",
+        "n": 1147,
+        "share_pct": 11.73,
+        "mae": 37.84987709059117,
+        "bias": -16.092360417279096,
+        "mean_price": 102.45771578029643,
+        "mae_pct_of_price": 36.9,
+        "mae_ridge": 38.7276421433821,
+        "gain_vs_ridge_pct": 2.3
       }
     ],
     "price_band": [
       {
         "band": "US$ 10-60",
-        "n": 1608,
+        "n": 2010,
         "share_pct": 20.56,
-        "mae": 16.108418965183823,
-        "bias": 14.302174925420978,
-        "mean_price": 47.14614427860697,
-        "mae_pct_of_price": 34.2,
-        "mae_ridge": 19.87411453707794,
-        "gain_vs_ridge_pct": 18.9
+        "mae": 17.686867477256186,
+        "bias": 16.683615426716546,
+        "mean_price": 47.36069651741293,
+        "mae_pct_of_price": 37.3,
+        "mae_ridge": 19.553038530244898,
+        "gain_vs_ridge_pct": 9.5
       },
       {
         "band": "US$ 60-90",
-        "n": 1574,
+        "n": 1967,
         "share_pct": 20.12,
-        "mae": 21.29238221986805,
-        "bias": 7.396137127748122,
-        "mean_price": 76.5559085133418,
-        "mae_pct_of_price": 27.8,
-        "mae_ridge": 23.07055711720796,
-        "gain_vs_ridge_pct": 7.7
+        "mae": 19.263413014874665,
+        "bias": 9.48061636351736,
+        "mean_price": 76.41687849517031,
+        "mae_pct_of_price": 25.2,
+        "mae_ridge": 23.479176243712043,
+        "gain_vs_ridge_pct": 18.0
       },
       {
         "band": "US$ 90-130",
-        "n": 1569,
+        "n": 1961,
         "share_pct": 20.06,
-        "mae": 32.337659272547334,
-        "bias": 11.988527151342838,
-        "mean_price": 110.05736137667304,
-        "mae_pct_of_price": 29.4,
-        "mae_ridge": 35.87780930117769,
-        "gain_vs_ridge_pct": 9.9
+        "mae": 28.497544530571307,
+        "bias": 7.701451145843067,
+        "mean_price": 110.03314635390107,
+        "mae_pct_of_price": 25.9,
+        "mae_ridge": 35.11715284512289,
+        "gain_vs_ridge_pct": 18.9
       },
       {
-        "band": "US$ 130-200",
-        "n": 1730,
-        "share_pct": 22.12,
-        "mae": 41.38239901488466,
-        "bias": -6.349501806523149,
-        "mean_price": 167.81387283236995,
-        "mae_pct_of_price": 24.7,
-        "mae_ridge": 41.76723282671846,
-        "gain_vs_ridge_pct": 0.9
+        "band": "US$ 130-199",
+        "n": 1890,
+        "share_pct": 19.33,
+        "mae": 38.04734865503202,
+        "bias": -4.585066530573929,
+        "mean_price": 162.22063492063492,
+        "mae_pct_of_price": 23.5,
+        "mae_ridge": 41.57358005561796,
+        "gain_vs_ridge_pct": 8.5
       },
       {
-        "band": "US$ 200-9999",
-        "n": 1341,
-        "share_pct": 17.14,
-        "mae": 188.5940456886194,
-        "bias": -174.06245587483627,
-        "mean_price": 384.75540641312455,
-        "mae_pct_of_price": 49.0,
-        "mae_ridge": 190.651377212652,
-        "gain_vs_ridge_pct": 1.1
+        "band": "US$ 199-10000",
+        "n": 1949,
+        "share_pct": 19.93,
+        "mae": 173.81073329104842,
+        "bias": -162.476765075039,
+        "mean_price": 361.3740379681888,
+        "mae_pct_of_price": 48.1,
+        "mae_ridge": 172.10276648407975,
+        "gain_vs_ridge_pct": -1.0
       },
       {
         "band": "tail: > US$ 500",
-        "n": 166,
-        "share_pct": 2.12,
-        "mae": 768.73720430172,
-        "bias": -768.73720430172,
-        "mean_price": 1003.8614457831326,
-        "mae_pct_of_price": 76.6,
-        "mae_ridge": 793.0593481386621,
-        "gain_vs_ridge_pct": 3.1
+        "n": 194,
+        "share_pct": 1.98,
+        "mae": 857.9898772676876,
+        "bias": -857.6915150800512,
+        "mean_price": 1103.5,
+        "mae_pct_of_price": 77.8,
+        "mae_ridge": 882.2298454380731,
+        "gain_vs_ridge_pct": 2.7
       }
     ],
     "availability_zero": [
       {
         "group": "availability_365 == 0",
-        "n": 2787,
-        "share_pct": 35.63,
-        "mae": 43.20476279970176,
-        "bias": -16.42456670351899,
-        "mean_price": 128.95801937567276,
-        "mae_pct_of_price": 33.5,
-        "mae_ridge": 45.36256385629722,
-        "gain_vs_ridge_pct": 4.8
+        "n": 3486,
+        "share_pct": 35.66,
+        "mae": 50.805213833477836,
+        "bias": -24.245141686881187,
+        "mean_price": 138.19736087205968,
+        "mae_pct_of_price": 36.8,
+        "mae_ridge": 52.8381552563067,
+        "gain_vs_ridge_pct": 3.8
       },
       {
         "group": "availability_365 > 0",
-        "n": 5035,
-        "share_pct": 64.37,
-        "mae": 62.410889046700085,
-        "bias": -28.833705626836874,
-        "mean_price": 162.03753723932473,
-        "mae_pct_of_price": 38.5,
-        "mae_ridge": 64.75834360209402,
-        "gain_vs_ridge_pct": 3.6
+        "n": 6291,
+        "share_pct": 64.34,
+        "mae": 57.68320689441326,
+        "bias": -27.583761224261767,
+        "mean_price": 157.43776824034336,
+        "mae_pct_of_price": 36.6,
+        "mae_ridge": 61.06476439446257,
+        "gain_vs_ridge_pct": 5.5
       }
     ]
   },
   "largest_error_subgroup": {
-    "family": "room_type",
-    "group": "Entire home/apt",
-    "mae": 76.6274696460838,
-    "n": 4086,
-    "mean_price": 205.5425844346549
+    "family": "neighbourhood_group",
+    "group": "Staten Island",
+    "mae": 108.08195255926768,
+    "n": 73,
+    "mean_price": 164.64383561643837
   },
   "largest_error_band": {
     "family": "price_band",
     "group": "tail: > US$ 500",
-    "mae": 768.73720430172,
-    "n": 166,
-    "mean_price": 1003.8614457831326
+    "mae": 857.9898772676876,
+    "n": 194,
+    "mean_price": 1103.5
   },
   "worst_cases": [
     {
-      "row_index": 12342,
-      "price_true": 9999.0,
-      "price_pred": 82.81318195634572,
-      "abs_error": 9916.186818043654,
-      "room_type": "Private room",
-      "neighbourhood_group": "Manhattan",
-      "neighbourhood": "Lower East Side",
-      "minimum_nights": 99.0,
-      "number_of_reviews": 6.0,
-      "reviews_per_month": 0.14,
+      "row_index": 17692,
+      "price_true": 10000.0,
+      "price_pred": 142.4895686963025,
+      "abs_error": 9857.510431303697,
+      "room_type": "Entire home/apt",
+      "neighbourhood_group": "Brooklyn",
+      "neighbourhood": "Greenpoint",
+      "minimum_nights": 5.0,
+      "number_of_reviews": 5.0,
+      "reviews_per_month": 0.16,
       "calculated_host_listings_count": 1.0,
-      "availability_365": 83.0,
-      "latitude": 40.71355,
-      "longitude": -73.98507
+      "availability_365": 0.0,
+      "latitude": 40.7326,
+      "longitude": -73.95739
     },
     {
-      "row_index": 44034,
-      "price_true": 6800.0,
-      "price_pred": 537.6457980752724,
-      "abs_error": 6262.354201924728,
+      "row_index": 48043,
+      "price_true": 6500.0,
+      "price_pred": 459.15007957980265,
+      "abs_error": 6040.849920420197,
+      "room_type": "Entire home/apt",
+      "neighbourhood_group": "Manhattan",
+      "neighbourhood": "Tribeca",
+      "minimum_nights": 180.0,
+      "number_of_reviews": 0.0,
+      "reviews_per_month": NaN,
+      "calculated_host_listings_count": 1.0,
+      "availability_365": 365.0,
+      "latitude": 40.71206,
+      "longitude": -74.00999
+    },
+    {
+      "row_index": 3720,
+      "price_true": 5250.0,
+      "price_pred": 195.4187072145909,
+      "abs_error": 5054.5812927854095,
+      "room_type": "Entire home/apt",
+      "neighbourhood_group": "Manhattan",
+      "neighbourhood": "Little Italy",
+      "minimum_nights": 1.0,
+      "number_of_reviews": 0.0,
+      "reviews_per_month": NaN,
+      "calculated_host_listings_count": 1.0,
+      "availability_365": 0.0,
+      "latitude": 40.71895,
+      "longitude": -73.99793
+    },
+    {
+      "row_index": 22353,
+      "price_true": 5000.0,
+      "price_pred": 153.89234565042713,
+      "abs_error": 4846.107654349573,
+      "room_type": "Entire home/apt",
+      "neighbourhood_group": "Staten Island",
+      "neighbourhood": "Randall Manor",
+      "minimum_nights": 1.0,
+      "number_of_reviews": 0.0,
+      "reviews_per_month": NaN,
+      "calculated_host_listings_count": 1.0,
+      "availability_365": 344.0,
+      "latitude": 40.63952,
+      "longitude": -74.0973
+    },
+    {
+      "row_index": 28947,
+      "price_true": 4160.0,
+      "price_pred": 294.49700880110623,
+      "abs_error": 3865.5029911988936,
       "room_type": "Entire home/apt",
       "neighbourhood_group": "Manhattan",
       "neighbourhood": "Chelsea",
@@ -262,62 +311,46 @@
       "reviews_per_month": NaN,
       "calculated_host_listings_count": 6.0,
       "availability_365": 364.0,
-      "latitude": 40.7506,
-      "longitude": -74.00388
+      "latitude": 40.74888,
+      "longitude": -74.00481
     },
     {
-      "row_index": 2698,
-      "price_true": 5000.0,
-      "price_pred": 371.08992931435785,
-      "abs_error": 4628.9100706856425,
+      "row_index": 17665,
+      "price_true": 3800.0,
+      "price_pred": 186.32861608784816,
+      "abs_error": 3613.6713839121517,
       "room_type": "Entire home/apt",
       "neighbourhood_group": "Manhattan",
-      "neighbourhood": "Nolita",
-      "minimum_nights": 1.0,
+      "neighbourhood": "Greenwich Village",
+      "minimum_nights": 30.0,
       "number_of_reviews": 2.0,
-      "reviews_per_month": 0.03,
+      "reviews_per_month": 0.06,
       "calculated_host_listings_count": 1.0,
-      "availability_365": 365.0,
-      "latitude": 40.72193,
-      "longitude": -73.99379
+      "availability_365": 180.0,
+      "latitude": 40.73305,
+      "longitude": -73.99373
     },
     {
-      "row_index": 29663,
-      "price_true": 3518.0,
-      "price_pred": 326.24808580922416,
-      "abs_error": 3191.751914190776,
+      "row_index": 3788,
+      "price_true": 3750.0,
+      "price_pred": 219.08742393456552,
+      "abs_error": 3530.9125760654347,
       "room_type": "Entire home/apt",
       "neighbourhood_group": "Manhattan",
       "neighbourhood": "East Village",
       "minimum_nights": 1.0,
       "number_of_reviews": 0.0,
       "reviews_per_month": NaN,
-      "calculated_host_listings_count": 12.0,
-      "availability_365": 215.0,
-      "latitude": 40.72779,
-      "longitude": -73.98644
-    },
-    {
-      "row_index": 28727,
-      "price_true": 3000.0,
-      "price_pred": 75.5541908391974,
-      "abs_error": 2924.4458091608026,
-      "room_type": "Private room",
-      "neighbourhood_group": "Brooklyn",
-      "neighbourhood": "Brighton Beach",
-      "minimum_nights": 1.0,
-      "number_of_reviews": 0.0,
-      "reviews_per_month": NaN,
       "calculated_host_listings_count": 1.0,
-      "availability_365": 90.0,
-      "latitude": 40.58363,
-      "longitude": -73.96405
+      "availability_365": 0.0,
+      "latitude": 40.73323,
+      "longitude": -73.98859
     },
     {
-      "row_index": 38498,
-      "price_true": 2999.0,
-      "price_pred": 189.90105126010977,
-      "abs_error": 2809.09894873989,
+      "row_index": 5839,
+      "price_true": 2695.0,
+      "price_pred": 187.13337371136203,
+      "abs_error": 2507.866626288638,
       "room_type": "Entire home/apt",
       "neighbourhood_group": "Manhattan",
       "neighbourhood": "Upper West Side",
@@ -326,204 +359,172 @@
       "reviews_per_month": NaN,
       "calculated_host_listings_count": 1.0,
       "availability_365": 0.0,
-      "latitude": 40.79009,
-      "longitude": -73.97544
+      "latitude": 40.7681,
+      "longitude": -73.98377
     },
     {
-      "row_index": 46533,
-      "price_true": 2995.0,
-      "price_pred": 206.58744911625342,
-      "abs_error": 2788.4125508837465,
-      "room_type": "Entire home/apt",
-      "neighbourhood_group": "Manhattan",
-      "neighbourhood": "Chelsea",
-      "minimum_nights": 30.0,
-      "number_of_reviews": 1.0,
-      "reviews_per_month": 1.0,
-      "calculated_host_listings_count": 1.0,
-      "availability_365": 214.0,
-      "latitude": 40.73999,
-      "longitude": -73.99806
-    },
-    {
-      "row_index": 22992,
-      "price_true": 2900.0,
-      "price_pred": 313.8455962034211,
-      "abs_error": 2586.1544037965787,
-      "room_type": "Entire home/apt",
-      "neighbourhood_group": "Manhattan",
-      "neighbourhood": "Upper West Side",
-      "minimum_nights": 1.0,
-      "number_of_reviews": 0.0,
-      "reviews_per_month": NaN,
-      "calculated_host_listings_count": 1.0,
-      "availability_365": 180.0,
-      "latitude": 40.77978,
-      "longitude": -73.97598
-    },
-    {
-      "row_index": 29665,
-      "price_true": 2626.0,
-      "price_pred": 227.32203023442167,
-      "abs_error": 2398.6779697655784,
-      "room_type": "Entire home/apt",
-      "neighbourhood_group": "Brooklyn",
-      "neighbourhood": "Park Slope",
-      "minimum_nights": 1.0,
-      "number_of_reviews": 0.0,
-      "reviews_per_month": NaN,
-      "calculated_host_listings_count": 12.0,
-      "availability_365": 31.0,
-      "latitude": 40.67859,
-      "longitude": -73.97787
-    },
-    {
-      "row_index": 45710,
+      "row_index": 24477,
       "price_true": 2500.0,
-      "price_pred": 192.23332038139984,
-      "abs_error": 2307.7666796186004,
-      "room_type": "Entire home/apt",
-      "neighbourhood_group": "Manhattan",
-      "neighbourhood": "Hell's Kitchen",
-      "minimum_nights": 70.0,
+      "price_pred": 73.86130326312325,
+      "abs_error": 2426.1386967368767,
+      "room_type": "Private room",
+      "neighbourhood_group": "Bronx",
+      "neighbourhood": "Riverdale",
+      "minimum_nights": 2.0,
       "number_of_reviews": 0.0,
       "reviews_per_month": NaN,
       "calculated_host_listings_count": 3.0,
-      "availability_365": 191.0,
-      "latitude": 40.75535,
-      "longitude": -73.99502
+      "availability_365": 179.0,
+      "latitude": 40.88671,
+      "longitude": -73.9151
+    },
+    {
+      "row_index": 28858,
+      "price_true": 3000.0,
+      "price_pred": 608.3673126301263,
+      "abs_error": 2391.6326873698736,
+      "room_type": "Entire home/apt",
+      "neighbourhood_group": "Manhattan",
+      "neighbourhood": "SoHo",
+      "minimum_nights": 7.0,
+      "number_of_reviews": 1.0,
+      "reviews_per_month": 1.0,
+      "calculated_host_listings_count": 1.0,
+      "availability_365": 325.0,
+      "latitude": 40.72605,
+      "longitude": -74.00572
     }
   ],
   "permutation": {
     "split": "validation",
-    "base_mae": 55.567693719368926,
+    "base_mae": 55.203443045725244,
     "n_repeats": 5,
     "rows": 7822,
     "features": [
       {
         "feature": "room_type",
-        "delta_mae_mean": 25.43141581627774,
-        "delta_mae_std": 0.3773221260620451,
+        "delta_mae_mean": 24.485006399317363,
+        "delta_mae_std": 0.31318109479863393,
         "deltas": [
-          25.5940931943344,
-          24.998576540943596,
-          25.584229658575957,
-          25.973726490990835,
-          25.006453196543937
+          24.538146468430135,
+          24.07046374502564,
+          24.571101880903647,
+          24.99037796735029,
+          24.254941934877102
         ]
       },
       {
-        "feature": "longitude",
-        "delta_mae_mean": 9.568939044870971,
-        "delta_mae_std": 0.30767375189074697,
-        "deltas": [
-          9.638090057361374,
-          9.697561306518786,
-          9.595289879111554,
-          9.91849369577863,
-          8.995260285584514
-        ],
-        "eda_spearman_with_price": -0.439
-      },
-      {
         "feature": "minimum_nights",
-        "delta_mae_mean": 7.564322238679187,
-        "delta_mae_std": 0.17316712514784716,
+        "delta_mae_mean": 5.512434334929624,
+        "delta_mae_std": 0.2220261434135,
         "deltas": [
-          7.383586679840079,
-          7.433304593121562,
-          7.793450717605381,
-          7.45699070144051,
-          7.754278501388406
+          5.241714485299028,
+          5.3514304733054985,
+          5.80053284814997,
+          5.42000365512164,
+          5.7484902127719835
         ],
         "eda_spearman_with_price": 0.102
       },
       {
         "feature": "availability_365",
-        "delta_mae_mean": 7.018901026540452,
-        "delta_mae_std": 0.26890123601282556,
+        "delta_mae_mean": 5.214629594262165,
+        "delta_mae_std": 0.23173112565602028,
         "deltas": [
-          7.047367308667887,
-          6.653444916530077,
-          6.777418248964587,
-          7.335901213950756,
-          7.280373444588953
+          5.1786711500659095,
+          5.152235450346794,
+          4.83148358830335,
+          5.472543158788099,
+          5.438214623806672
         ],
         "eda_spearman_with_price": 0.086
       },
       {
-        "feature": "neighbourhood",
-        "delta_mae_mean": 5.981277041805039,
-        "delta_mae_std": 0.3234679842552164,
+        "feature": "longitude",
+        "delta_mae_mean": 4.637451629118428,
+        "delta_mae_std": 0.2680164775417912,
         "deltas": [
-          5.3997642897858285,
-          5.947755337700968,
-          6.341888237065987,
-          6.004876735659799,
-          6.212100608812612
+          4.728810473861458,
+          4.209645329239102,
+          4.927346065752907,
+          4.864046996671867,
+          4.4574092800668055
+        ],
+        "eda_spearman_with_price": -0.439
+      },
+      {
+        "feature": "neighbourhood",
+        "delta_mae_mean": 3.6084276822549883,
+        "delta_mae_std": 0.18050149432457505,
+        "deltas": [
+          3.3642918358691816,
+          3.694294810160308,
+          3.7754989566199555,
+          3.4196668115208126,
+          3.788385997104683
         ]
       },
       {
-        "feature": "latitude",
-        "delta_mae_mean": 4.8271085467220445,
-        "delta_mae_std": 0.17512140199330317,
-        "deltas": [
-          4.511914474106575,
-          4.765349103382917,
-          4.980386051731344,
-          4.967812816665003,
-          4.910080287724384
-        ],
-        "eda_spearman_with_price": 0.132
-      },
-      {
         "feature": "calculated_host_listings_count",
-        "delta_mae_mean": 3.5893730221695463,
-        "delta_mae_std": 0.24704276333010755,
+        "delta_mae_mean": 2.827623336329336,
+        "delta_mae_std": 0.2195255224484985,
         "deltas": [
-          3.8688876393139893,
-          3.1478836932180414,
-          3.7584972000898347,
-          3.6275166352172405,
-          3.544079943008626
+          3.075075697940079,
+          2.4351995008631278,
+          2.819575051477777,
+          2.987667157755091,
+          2.820599273610604
         ],
         "eda_spearman_with_price": -0.108
       },
       {
-        "feature": "number_of_reviews",
-        "delta_mae_mean": 2.899646391008237,
-        "delta_mae_std": 0.16527759132001013,
+        "feature": "neighbourhood_group",
+        "delta_mae_mean": 2.7862400388999986,
+        "delta_mae_std": 0.11142647942787705,
         "deltas": [
-          2.719879270152461,
-          2.8213665333601696,
-          3.1871117543165752,
-          2.9717427321977397,
-          2.798131665014239
+          2.686549362901445,
+          2.9254265935716433,
+          2.64676579718126,
+          2.7717417291381423,
+          2.900716711707503
+        ]
+      },
+      {
+        "feature": "latitude",
+        "delta_mae_mean": 2.589033571615893,
+        "delta_mae_std": 0.1164399393046672,
+        "deltas": [
+          2.3585091457307357,
+          2.6523599807345235,
+          2.63132891022002,
+          2.628568572299308,
+          2.6744012490948776
+        ],
+        "eda_spearman_with_price": 0.132
+      },
+      {
+        "feature": "number_of_reviews",
+        "delta_mae_mean": 2.1393336030240717,
+        "delta_mae_std": 0.1340216061115109,
+        "deltas": [
+          1.9794834829710695,
+          2.120552755280805,
+          2.3062663743282457,
+          2.279289374043614,
+          2.0110760284966247
         ],
         "eda_spearman_with_price": -0.057
       },
       {
-        "feature": "neighbourhood_group",
-        "delta_mae_mean": 2.3997522818080386,
-        "delta_mae_std": 0.11538748906946607,
-        "deltas": [
-          2.4248887551517058,
-          2.2664301051201647,
-          2.4962188449129172,
-          2.26634546840571,
-          2.544878235449694
-        ]
-      },
-      {
         "feature": "reviews_per_month",
-        "delta_mae_mean": 1.3222255078987515,
-        "delta_mae_std": 0.09861792969154559,
+        "delta_mae_mean": 1.2105141009438043,
+        "delta_mae_std": 0.09443816496811415,
         "deltas": [
-          1.3658638724562948,
-          1.4657726849271242,
-          1.335197856210101,
-          1.2765409979797582,
-          1.1677521279204797
+          1.1629918065503588,
+          1.1404414672331669,
+          1.3965567103440222,
+          1.1609622222068197,
+          1.191618298384654
         ],
         "eda_spearman_with_price": -0.021
       }
